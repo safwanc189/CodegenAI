@@ -268,8 +268,10 @@ async def update_project(project_id: str = Form(...), project: str = Form(...)):
         print("❌ [Update Project ERROR]:", e)
         return {"success": False, "error": str(e)}
 
+
+
 # =============================================================================
-# 🧱 API: generate Wireframe Layout 
+# 🧱 API: Generate Wireframe Layout (Corrected - Single Endpoint)
 # =============================================================================
 
 @app.post("/api/generate-wireframe")
@@ -277,56 +279,42 @@ async def generate_wireframe(project_id: str = Form(...)):
     from services.ai_agent import generate_wireframe_ai
 
     print("\n🤖 [AI AGENT] Generating wireframe via LLaMA...")
+
+    # fetch project
     project = await get_project(project_id)
     if not project:
-        return {"error": "Project not found"}
+        return {"success": False, "error": "Project not found"}
 
+    # ensure tech field exists for prompt
+    project["tech"] = project.get("tech") or project.get("tech_stack", [])
+
+    # call AI agent
     wireframe = await generate_wireframe_ai(project)
 
-    # ✅ Save AI result to DB immediately
+    # must be dict
+    if not isinstance(wireframe, dict):
+        return {
+            "success": False,
+            "error": "Invalid JSON returned from AI",
+            "raw_output": wireframe
+        }
+
+    # save to DB
     oid = ObjectId(project_id)
-    try:
-        result = await collection.update_one(
-            {"_id": oid},
-            {"$set": {"wireframe": wireframe}}
-        )
-        if result.modified_count > 0:
-            print(f"✅ [DB] Wireframe stored for Project {project_id}")
-        else:
-            print(f"⚠️ [DB] Wireframe not modified (may be identical)")
-    except Exception as e:
-        print("❌ [DB Update Error while saving wireframe]:", e)
+    result = await collection.update_one(
+        {"_id": oid},
+        {"$set": {"wireframe": wireframe}}
+    )
 
-    # Return result to frontend
-    return {"success": True, "wireframe": wireframe}
+    if result.modified_count > 0:
+        print(f"✅ [DB] Wireframe stored for Project {project_id}")
+    else:
+        print(f"⚠️ [DB] Wireframe not modified (likely identical)")
 
-
-# =============================================================================
-# 🧱 API: Update Wireframe Layout (after editing or adding new components)
-# =============================================================================
-
-@app.post("/api/update-wireframe")
-async def update_wireframe(project_id: str = Form(...), wireframe: str = Form(...)):
-    import json
-    try:
-        wireframe_data = json.loads(wireframe)
-
-        oid = ObjectId(project_id)
-
-        # ✅ Use the correct collection object (from db_service)
-        result = await collection.update_one(
-            {"_id": oid},
-            {"$set": {"wireframe": wireframe_data}}
-        )
-
-        if result.modified_count > 0:
-            print(f"✅ [DB] Wireframe updated for {project_id}")
-            return {"success": True, "message": "Wireframe updated"}
-        else:
-            print(f"⚠️ [DB] No document modified for {project_id}")
-            return {"success": False, "message": "No changes made"}
-
-    except Exception as e:
-        print("❌ [Update Error]:", e)
-        return {"success": False, "error": str(e)}
-
+    # return proper structure
+    return {
+        "success": True,
+        "project_id": project_id,
+        "title": project.get("title"),
+        "wireframe": wireframe
+    }

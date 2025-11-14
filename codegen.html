@@ -910,27 +910,7 @@ Teacher Module:
                         <div class="wireframe-container" id="wireframe-container" style="display:none;">
                             <div class="wireframe-preview">
                                 <h4>Wireframe Preview</h4>
-                                <div class="wireframe-box">
-                                    <div class="wireframe-header">
-                                        My Application
-                                    </div>
-                                    <div class="wireframe-sidebar">
-                                        <div class="wireframe-element">Dashboard</div>
-                                        <div class="wireframe-element">Users</div>
-                                        <div class="wireframe-element">Products</div>
-                                        <div class="wireframe-element">Settings</div>
-                                    </div>
-                                    <div class="wireframe-content">
-                                        <div class="wireframe-element" style="height: 50px; background-color: #e2e8f0;">
-                                            Page Title</div>
-                                        <div class="wireframe-element">Data Table Row</div>
-                                        <div class="wireframe-element">Data Table Row</div>
-                                        <div class="wireframe-element">Data Table Row</div>
-                                        <div class="wireframe-element"
-                                            style="height: 40px; background-color: #4361ee; color: white; justify-content: center;">
-                                            Action Button</div>
-                                    </div>
-                                </div>
+                                <div class="wireframe-box"></div>
                             </div>
 
                             <div class="wireframe-edit">
@@ -1225,7 +1205,7 @@ Teacher Module:
         function initApp() {
             // Set up event listeners for navigation
             nextToStep2Btn.addEventListener('click', goToStep2);
-            nextToStep3Btn.addEventListener('click', goToStep3);
+            nextToStep3Btn.addEventListener('click', generateWireframeStep);
             nextToStep4Btn.addEventListener('click', goToStep4);
             nextToStep5Btn.addEventListener('click', goToStep5);
             nextToStep6Btn.addEventListener('click', goToStep6);
@@ -1265,7 +1245,7 @@ Teacher Module:
 
             // Edit buttons
             // Edit Project button (Step 2)
-           
+
             updateWireframeBtn.addEventListener('click', updateWireframe);
             addApiBtn.addEventListener('click', addNewAPI);
         }
@@ -1336,6 +1316,7 @@ Teacher Module:
                 }
 
                 const data = await res.json();
+
                 if (data.error) {
                     alert("Error: " + data.error);
                     return;
@@ -1458,6 +1439,7 @@ Teacher Module:
             });
 
             const data = await res.json();
+
             if (data.success) {
                 alert("✅ Project updated!");
                 document.getElementById("edit-form").style.display = "none";
@@ -1467,98 +1449,268 @@ Teacher Module:
         });
 
 
-        async function goToStep3() {
-            // show loading in progress UI
-            progressFill.style.width = '0%';
-            progressText.textContent = 'Generating UI wireframe via AI...';
-            // show simple spinner or disable buttons
-            document.getElementById('next-to-step-3').disabled = true;
+        // ---------- Replace generateWireframeStep ----------
+        async function generateWireframeStep() {
+            const btn = document.getElementById("next-to-step-3");
 
-            // get latest project id — ideally stored after upload
-            // If you saved project_id from upload response, keep it in a variable `lastProjectId`.
-            // Here we'll try to use a global variable or ask backend for latest.
-            let projectId = window.lastProjectId || null;
-
-            if (!projectId) {
-                // fallback: fetch latest project from backend
-                try {
-                    const res = await fetch(`${BACKEND_URL}/api/get-latest-project`);
-                    const j = await res.json();
-                    if (j.success && j.project && j.project._id) {
-                        projectId = j.project._id;
-                        window.lastProjectId = projectId;
-                    }
-                } catch (e) {
-                    console.error('Could not fetch latest project', e);
-                }
-            }
-
-            if (!projectId) {
-                alert('Project ID not found. Please upload synopsis first.');
-                document.getElementById('next-to-step-3').disabled = false;
-                return;
-            }
+            showLoader();
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generating...`;
 
             try {
+                let projectId = window.lastProjectId;
                 const form = new FormData();
-                form.append('project_id', projectId);
+                form.append("project_id", projectId);
 
                 const res = await fetch(`${BACKEND_URL}/api/generate-wireframe`, {
-                    method: 'POST',
-                    body: form
+                    method: "POST",
+                    body: form,
                 });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    console.error('Wireframe AI error', text);
-                    alert('AI error. See console.');
-                    document.getElementById('next-to-step-3').disabled = false;
-                    return;
-                }
-
                 const data = await res.json();
-                if (!data.success || !data.wireframe) {
-                    console.error('Bad response', data);
-                    alert('AI returned no wireframe.');
-                    document.getElementById('next-to-step-3').disabled = false;
+
+                if (!data.success) {
+                    alert("Wireframe generation failed.");
                     return;
                 }
 
-                // use returned wireframe object to populate UI controls
-                const w = data.wireframe;
-                document.getElementById('app-name').value = w.app_name || 'My Application';
-                document.getElementById('nav-items').value = (w.nav_items || []).join(', ');
-                document.getElementById('primary-color').value = w.primary_color || '#4361ee';
-                document.getElementById('layout-type').value = w.layout_type || 'sidebar';
-                document.getElementById('color-scheme').value = w.color_scheme || 'blue';
-
-                // 🧠 Render AI wireframe HTML directly from backend
-                const previewBox = document.querySelector(".wireframe-box");
-
-                document.getElementById("wireframe-container").style.display = "grid";
-
-                if (w.html_layout) {
-                    previewBox.innerHTML = w.html_layout; // direct from LLaMA
-                } else {
-                    // fallback to dynamic template
-                    updateWireframe();
-                }
-
-                // store wireframe JSON for later updates
+                // REAL AI OUTPUT JSON
+                const w = data.wireframe || {};
                 window.currentWireframe = w;
 
-                // mark progress done and move to step 3
-                progressFill.style.width = '100%';
-                progressText.textContent = 'Wireframe generated';
+                // Normalize and read common fields safely
+                const layoutType = w.layout_type || w.layout?.type || w.ui_layout || 'sidebar';
+                const primaryColor = w.primary_color || w.primaryColor || w.layout?.primary_color || '#4361ee';
+                const colorScheme = w.color_scheme || w.colorScheme || 'blue';
+                const nav = w.navigation || w.nav || [];
+
+                // Fill right panel fields using normalized values
+                document.getElementById("app-name").value = w.app_name || w.appName || w.title || "My Application";
+                document.getElementById("layout-type").value = layoutType;
+                document.getElementById("primary-color").value = primaryColor;
+                document.getElementById("color-scheme").value = colorScheme;
+                document.getElementById("nav-items").value = (nav || []).map(n => n.label || n.name || n).join(", ");
+
+                // Render Preview (uses the robust renderer below)
+                renderAIWireframePreview(w);
+
+                // Show the wireframe section
+                document.getElementById("wireframe-container").style.display = "grid";
+
+                // Move user to Step 3
                 goToStep(3);
 
             } catch (err) {
-                console.error('Wireframe fetch failed', err);
-                alert('Failed to generate wireframe. Check backend logs.');
+                console.error("Wireframe Error:", err);
+                alert("Error generating wireframe.");
             } finally {
-                document.getElementById('next-to-step-3').disabled = false;
+                hideLoader();
+                btn.disabled = false;
+                btn.innerHTML = "Next: Generate UI Wireframe";
             }
         }
+
+
+        // ---------- Replace renderComponent ----------
+        function renderComponent(c, primary, radius, shadow, isMobile = false) {
+            // make sure c is object and has a type
+            if (!c || typeof c !== 'object') c = { type: 'card', title: String(c || '') };
+
+            const safeTitle = c.title || c.label || c.name || '';
+            const baseStyle = `
+        padding:15px;
+        background:white;
+        border-radius:${radius}px;
+        border:1px solid #ddd;
+        box-shadow:${shadow};
+    `;
+
+            // Normalize component type aliases
+            const t = (c.type || '').toString().toLowerCase();
+            if (t === 'stat' || t === 'stat_card' || t === 'card' || t.includes('stats')) {
+                return `
+            <div style="${baseStyle}">
+                <h4 style="margin:0 0 6px 0;">${safeTitle}</h4>
+                <p style="font-size:20px;font-weight:bold;color:${primary};margin:0;">${c.value ?? c.count ?? ''}</p>
+                ${c.subtitle ? `<small style="color:${primary};opacity:.7">${c.subtitle}</small>` : ''}
+            </div>
+        `;
+            }
+
+            if (t === 'chart' || t.includes('chart')) {
+                return `
+            <div style="${baseStyle};text-align:center;">
+                <h4 style="margin-bottom:8px;">${safeTitle}</h4>
+                <div style="height:${isMobile ? 120 : 180}px;background:#e9ecef;border-radius:${radius}px;"></div>
+            </div>
+        `;
+            }
+
+            if (t === 'table' || t.includes('table')) {
+                const cols = (c.columns || []).slice(0, 4).map(col => `<th style="text-align:left;padding:6px 8px;">${col}</th>`).join("");
+                return `
+            <div style="${baseStyle}">
+                <h4 style="margin-bottom:10px;">${safeTitle}</h4>
+                <div style="overflow:auto;border-radius:${radius}px;background:#fff;border:1px solid #f1f1f1;padding:8px;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead><tr>${cols}</tr></thead>
+                        <tbody>
+                            <tr><td colspan="${Math.max(1, (c.columns || []).length)}" style="padding:12px;color:#888;">Table preview</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+            }
+
+            if (t === 'button' || t === 'cta') {
+                return `<div style="${baseStyle};display:flex;align-items:center;justify-content:center;"><button class="btn btn-primary">${c.label || safeTitle || 'Action'}</button></div>`;
+            }
+
+            // fallback simple box
+            return `<div style="${baseStyle}">${safeTitle}</div>`;
+        }
+
+
+        // ---------- Replace renderAIWireframePreview ----------
+        function renderAIWireframePreview(w) {
+            const preview = document.querySelector(".wireframe-box");
+            preview.innerHTML = "";
+
+            // Robust normalization for layout, colors, nav and pages
+            const layout = (w.layout_type || w.layout?.type || w.ui_layout || w.layoutType || 'sidebar').toString().toLowerCase();
+            const primary = w.primary_color || w.primaryColor || w.layout?.primary_color || '#4361ee';
+            const radius = (w.style?.corner_radius || 10);
+            const shadow = (w.style?.shadow ? "0 4px 12px rgba(0,0,0,0.12)" : "none");
+            const navigation = w.navigation || w.nav || [];
+            let pages = w.pages || w.pageMap || {};
+
+            // If pages is array -> convert to object keyed by id/title
+            if (Array.isArray(pages)) {
+                const obj = {};
+                pages.forEach(p => {
+                    const key = (p.id || p.key || (p.title && p.title.toLowerCase().replace(/\s+/g, '-')) || `page-${Math.random().toString(36).slice(2, 7)}`);
+                    obj[key] = { title: p.title || p.label || key, components: p.components || p.widgets || [] };
+                });
+                pages = obj;
+            }
+
+            // If pages is empty object, provide a safe default
+            if (!pages || (typeof pages === 'object' && Object.keys(pages).length === 0)) {
+                pages = {
+                    dashboard: {
+                        title: "Dashboard",
+                        components: [
+                            { type: "card", title: "Total Students", value: "250" },
+                            { type: "card", title: "Today Present", value: "230" },
+                            { type: "chart", title: "Attendance Trend" }
+                        ]
+                    }
+                };
+            }
+
+            // Ensure each page has components array
+            Object.keys(pages).forEach(k => {
+                const p = pages[k];
+                if (!Array.isArray(p.components)) {
+                    // if components is list of strings convert to {type:'card', title:...}
+                    if (Array.isArray(p) || Array.isArray(p.components)) {
+                        p.components = p.components || [];
+                    } else if (typeof p.components === 'string') {
+                        p.components = [{ type: 'card', title: p.components }];
+                    } else {
+                        p.components = p.components || [];
+                    }
+                }
+            });
+
+            // ---- SIDEBAR LAYOUT ----
+            if (layout === "sidebar") {
+                preview.innerHTML = `
+            <div style="display:flex;min-height:420px;border-radius:${radius}px;overflow:hidden;
+                border:1px solid #ddd;box-shadow:${shadow};">
+
+                <aside style="width:240px;background:${primary};color:white;padding:20px;">
+                    <h3 style="margin-bottom:20px;">${w.app_name || w.appName || w.title || 'App'}</h3>
+                    ${(navigation || []).map(n => `
+                        <div style="padding:10px 0;font-size:16px;">
+                            ${n.icon ? n.icon : '📌'} ${n.label || n.title || n.name || ''}
+                        </div>
+                    `).join("")}
+                </aside>
+
+                <main style="flex:1;background:#fafafa;padding:20px;">
+                    ${Object.keys(pages).map(pid => {
+                    const page = pages[pid];
+                    return `
+                            <h2 style="margin-bottom:15px;color:${primary};">${page.title}</h2>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
+                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
+                            </div>
+                        `;
+                }).join("")}
+                </main>
+            </div>
+        `;
+                return;
+            }
+
+            // ---- TOP NAV LAYOUT ----
+            if (layout === "topnav" || layout === "dashboard") {
+                preview.innerHTML = `
+            <div style="border:1px solid #ddd;border-radius:${radius}px;box-shadow:${shadow};overflow:hidden;">
+                <header style="background:${primary};color:white;padding:15px 20px;">
+                    <h2 style="margin:0;">${w.app_name || 'App'}</h2>
+                </header>
+
+                <nav style="display:flex;gap:20px;background:#f1f3f5;padding:12px 20px;border-bottom:1px solid #ddd;">
+                    ${(navigation || []).map(n => `<div style="font-weight:600;">${n.label || n.title || ''}</div>`).join("")}
+                </nav>
+
+                <div style="padding:20px;">
+                    ${Object.keys(pages).map(pid => {
+                    const page = pages[pid];
+                    return `
+                            <h2 style="color:${primary};">${page.title}</h2>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:15px;">
+                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
+                            </div>
+                        `;
+                }).join("")}
+                </div>
+            </div>
+        `;
+                return;
+            }
+
+            // ---- MOBILE LAYOUT: render ONLY if layout_type === 'mobile' ----
+            if (layout === "mobile") {
+                preview.innerHTML = `
+            <div style="width:360px;margin:auto;border-radius:${radius}px;
+                border:1px solid #aaa;overflow:hidden;box-shadow:${shadow};">
+
+                <header style="background:${primary};color:white;padding:12px;text-align:center;">
+                    <h3 style="margin:0;">${w.app_name || 'App'}</h3>
+                </header>
+
+                <div style="padding:15px;background:white;">
+                    ${Object.keys(pages).map(pid => {
+                    const page = pages[pid];
+                    return `
+                            <h4 style="margin-bottom:10px;color:${primary};">${page.title}</h4>
+                            ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow, true)).join("")}
+                        `;
+                }).join("")}
+                </div>
+            </div>
+        `;
+                return;
+            }
+
+            // default fallback if an unknown layout came through
+            preview.innerHTML = `<div style="padding:20px;">Unsupported layout: ${layout}. Showing default preview.</div>`;
+        }
+
         function goToStep4() {
             goToStep(4);
 
@@ -1606,76 +1758,31 @@ Teacher Module:
 
         // Update wireframe based on form values
         function updateWireframe() {
-            const appName = document.getElementById('app-name').value.trim() || "My Application";
-            const navItemsInput = document.getElementById('nav-items').value.trim();
-            const navItems = navItemsInput ? navItemsInput.split(',').map(i => i.trim()) : ["Dashboard"];
-            const primaryColor = document.getElementById('primary-color').value || "#4361ee";
-            const layoutType = document.getElementById('layout-type').value;
-            const colorScheme = document.getElementById('color-scheme').value;
+            // Update stored AI wireframe object
+            window.currentWireframe.app_name =
+                document.getElementById("app-name").value.trim() || "My Application";
 
-            // get the wireframe container
-            const previewContainer = document.querySelector('.wireframe-box');
+            window.currentWireframe.layout_type =
+                document.getElementById("layout-type").value;
 
-            // pick background for color scheme
-            let bgColor = "#f8f9fa";
-            if (colorScheme === "dark") bgColor = "#1e293b";
-            else if (colorScheme === "green") bgColor = "#e8f5e9";
-            else if (colorScheme === "purple") bgColor = "#f3e8ff";
+            window.currentWireframe.primary_color =
+                document.getElementById("primary-color").value;
 
-            // layout html
-            let layoutHTML = "";
+            window.currentWireframe.color_scheme =
+                document.getElementById("color-scheme").value;
 
-            if (layoutType === "sidebar") {
-                layoutHTML = `
-            <div style="display:flex;min-height:400px;border-radius:8px;overflow:hidden;background:${bgColor};">
-                <aside style="width:200px;background:${primaryColor};color:white;padding:12px;">
-                    ${navItems.map(item => `<div style="margin:8px 0;">${item}</div>`).join('')}
-                </aside>
-                <main style="flex:1;padding:16px;">
-                    <h3 style="background:${primaryColor};color:white;padding:10px;border-radius:6px;">${appName}</h3>
-                    <div style="margin-top:12px;">
-                        <div style="background:#e9ecef;padding:10px;margin:6px 0;border-radius:4px;">Page Title</div>
-                        <div style="background:#e9ecef;padding:10px;margin:6px 0;border-radius:4px;">Data Table Row</div>
-                        <div style="background:#e9ecef;padding:10px;margin:6px 0;border-radius:4px;">Data Table Row</div>
-                        <button style="background:${primaryColor};color:white;border:none;padding:10px 20px;margin-top:10px;border-radius:6px;">Action Button</button>
-                    </div>
-                </main>
-            </div>`;
-            } else if (layoutType === "topnav") {
-                layoutHTML = `
-            <div style="background:${bgColor};border-radius:8px;overflow:hidden;">
-                <header style="background:${primaryColor};color:white;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
-                    <div style="font-weight:600;">${appName}</div>
-                    <nav style="display:flex;gap:16px;">
-                        ${navItems.map(item => `<div>${item}</div>`).join('')}
-                    </nav>
-                </header>
-                <main style="padding:20px;">
-                    <div style="background:#e9ecef;padding:10px;margin:6px 0;border-radius:4px;">Page Title</div>
-                    <div style="background:#e9ecef;padding:10px;margin:6px 0;border-radius:4px;">Data Table Row</div>
-                    <div style="background:#e9ecef;padding:10px;margin:6px 0;border-radius:4px;">Data Table Row</div>
-                    <button style="background:${primaryColor};color:white;border:none;padding:10px 20px;margin-top:10px;border-radius:6px;">Action Button</button>
-                </main>
-            </div>`;
-            } else if (layoutType === "dashboard") {
-                layoutHTML = `
-            <div style="background:${bgColor};border-radius:8px;padding:20px;">
-                <h3 style="color:${primaryColor};margin-bottom:12px;">${appName} Dashboard</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
-                    <div style="background:#e9ecef;padding:20px;border-radius:8px;">Project Summary</div>
-                    <div style="background:#e9ecef;padding:20px;border-radius:8px;">Worker Stats</div>
-                    <div style="background:#e9ecef;padding:20px;border-radius:8px;">Progress Chart</div>
-                </div>
-                <button style="background:${primaryColor};color:white;padding:10px 20px;border:none;border-radius:6px;margin-top:20px;">Add New</button>
-            </div>`;
-            } else {
-                layoutHTML = `<div style="padding:20px;text-align:center;background:${bgColor};border-radius:8px;">Mobile Layout Preview Coming Soon...</div>`;
-            }
+            window.currentWireframe.navigation =
+                document.getElementById("nav-items").value
+                    .split(",")
+                    .map(i => ({
+                        id: i.trim().toLowerCase().replace(/\s+/g, "-"),
+                        label: i.trim(),
+                        path: "/" + i.trim().toLowerCase().replace(/\s+/g, "-")
+                    }));
 
-            // replace innerHTML
-            previewContainer.innerHTML = layoutHTML;
+            // Now re-render using AI system ONLY
+            renderAIWireframePreview(window.currentWireframe);
         }
-
         // Handle "Add New" button click dynamically
         document.addEventListener("click", async (e) => {
             if (e.target && e.target.textContent.trim() === "Add New") {
@@ -1701,18 +1808,23 @@ Teacher Module:
                     return;
                 }
 
-                // 3️⃣ Prepare updated wireframe JSON
                 const wireframe = {
+                    title: document.getElementById("app-name").value,
                     layout_type: document.getElementById("layout-type").value,
-                    app_name: document.getElementById("app-name").value,
-                    color_scheme: document.getElementById("color-scheme").value,
-                    primary_color: document.getElementById("primary-color").value,
-                    navigation: document
-                        .getElementById("nav-items")
-                        .value.split(",")
-                        .map((i) => i.trim())
-                        .filter(Boolean),
-                    added_component: newName
+
+                    navigation: document.getElementById("nav-items").value.split(",").map(i => ({
+                        id: i.trim().toLowerCase().replace(/\s+/g, "-"),
+                        label: i.trim(),
+                        path: "/" + i.trim().toLowerCase().replace(/\s+/g, "-")
+                    })),
+
+                    pages: window.currentWireframe?.pages || [],
+
+                    style: {
+                        primary_color: document.getElementById("primary-color").value,
+                        color_scheme: document.getElementById("color-scheme").value,
+                        customizable: true
+                    }
                 };
 
                 // 4️⃣ Send to backend to update MongoDB
