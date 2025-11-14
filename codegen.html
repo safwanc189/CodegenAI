@@ -955,6 +955,10 @@ Teacher Module:
                                 <button class="btn btn-primary" id="update-wireframe-btn">
                                     <i class="fas fa-sync-alt"></i> Update Wireframe
                                 </button>
+                                <div id="updateLoader"
+                                    style="display:none; margin-top:10px; font-weight:600; color:#6b46c1;">
+                                    Updating wireframe… Please wait...
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1477,12 +1481,29 @@ Teacher Module:
                 // REAL AI OUTPUT JSON
                 const w = data.wireframe || {};
                 window.currentWireframe = w;
+                const navKeyInit = (w.navigation || [])
+                    .map(n => (n.label || n.name || "").toLowerCase().replace(/\s+/g, ""))
+                    .join(",");
+                lastWireframe = { ...w };
+                lastWireframe.navigation_text = navKeyInit;
 
-                // Normalize and read common fields safely
-                const layoutType = w.layout_type || w.layout?.type || w.ui_layout || 'sidebar';
-                const primaryColor = w.primary_color || w.primaryColor || w.layout?.primary_color || '#4361ee';
-                const colorScheme = w.color_scheme || w.colorScheme || 'blue';
+
+                // Now normalize values SAFELY (after w exists)
+                const layoutType = w.layout_type || w.layout?.type || w.ui_layout || "sidebar";
+                const primaryColor = w.primary_color || w.primaryColor || w.layout?.primary_color || "#4361ee";
+                const colorScheme = w.color_scheme || w.colorScheme || "blue";
                 const nav = w.navigation || w.nav || [];
+
+                // Navigation text for change-detection
+                window.lastWireframe = window.lastWireframe || {};
+                window.lastWireframe.navigation_text =
+                    (nav || [])
+                        .map(n => (n.label || n.name || "").toLowerCase().replace(/\s+/g, ""))
+                        .join(",");
+
+                window.currentProjectId = projectId;
+
+
 
                 // Fill right panel fields using normalized values
                 document.getElementById("app-name").value = w.app_name || w.appName || w.title || "My Application";
@@ -1756,33 +1777,104 @@ Teacher Module:
             updateWireframe();
         }
 
-        // Update wireframe based on form values
-        function updateWireframe() {
-            // Update stored AI wireframe object
-            window.currentWireframe.app_name =
-                document.getElementById("app-name").value.trim() || "My Application";
+        async function updateWireframe() {
+            const layoutType = document.getElementById("layout-type").value;
+            const colorScheme = document.getElementById("color-scheme").value;
+            const primaryColor = document.getElementById("primary-color").value;
+            const appName = document.getElementById("app-name").value;
 
-            window.currentWireframe.layout_type =
-                document.getElementById("layout-type").value;
+            // Convert navigation text → normalized labels array
+            const navText = document.getElementById("nav-items").value;
+            const newNavList = navText
+                .split(",")
+                .map(x => x.trim().toLowerCase())
+                .filter(x => x.length > 0);
 
-            window.currentWireframe.primary_color =
-                document.getElementById("primary-color").value;
+            const newNavKey = newNavList.join(",");
 
-            window.currentWireframe.color_scheme =
-                document.getElementById("color-scheme").value;
+            // Read old normalized navigation string
+            const oldNavKey = lastWireframe.navigation_text || "";
 
-            window.currentWireframe.navigation =
-                document.getElementById("nav-items").value
-                    .split(",")
-                    .map(i => ({
-                        id: i.trim().toLowerCase().replace(/\s+/g, "-"),
-                        label: i.trim(),
-                        path: "/" + i.trim().toLowerCase().replace(/\s+/g, "-")
-                    }));
+            document.getElementById("updateLoader").style.display = "block";
 
-            // Now re-render using AI system ONLY
-            renderAIWireframePreview(window.currentWireframe);
+            // --------------------------------------------------------------------
+            // CASE 1: Navigation changed → MUST call AI
+            // --------------------------------------------------------------------
+            if (newNavKey !== oldNavKey) {
+                console.log("⚠️ Navigation changed → Calling AI...");
+
+                const fd = new FormData();
+                fd.append("project_id", currentProjectId);
+
+                const res = await fetch(`${BACKEND_URL}/api/generate-wireframe`, {
+                    method: "POST",
+                    body: fd
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    lastWireframe = { ...data.wireframe };
+                    lastWireframe.navigation_text = newNavKey;
+                    lastWireframe.navigation_text = newNavKey;
+
+                    // Update UI fields after AI generates new JSON
+                    document.getElementById("app-name").value =
+                        lastWireframe.app_name || "My Application";
+
+                    document.getElementById("layout-type").value =
+                        lastWireframe.layout_type || "sidebar";
+
+                    document.getElementById("primary-color").value =
+                        lastWireframe.primary_color || "#4361ee";
+
+                    document.getElementById("color-scheme").value =
+                        lastWireframe.color_scheme || "blue";
+
+                    document.getElementById("nav-items").value =
+                        (lastWireframe.navigation || [])
+                            .map(i => i.label)
+                            .join(", ");
+
+                    renderAIWireframePreview(lastWireframe);
+                }
+
+                document.getElementById("updateLoader").style.display = "none";
+                return;
+            }
+
+            // --------------------------------------------------------------------
+            // CASE 2: ONLY style/appName/layout changed → simple Mongo update
+            // --------------------------------------------------------------------
+            console.log("🎨 Style-only update → saving directly to Mongo (no AI)");
+
+            const updatedWireframe = {
+                ...lastWireframe,
+                app_name: appName,
+                layout_type: layoutType,
+                primary_color: primaryColor,
+                color_scheme: colorScheme
+            };
+
+            const fd = new FormData();
+            fd.append("project_id", currentProjectId);
+            fd.append("wireframe", JSON.stringify(updatedWireframe));
+
+            await fetch(`${BACKEND_URL}/api/update-wireframe`, {
+                method: "POST",
+                body: fd
+            });
+
+            // Update memory
+            lastWireframe = updatedWireframe;
+            lastWireframe.navigation_text = newNavKey;
+
+            // Update preview
+            renderAIWireframePreview(lastWireframe);
+
+            document.getElementById("updateLoader").style.display = "none";
         }
+
         // Handle "Add New" button click dynamically
         document.addEventListener("click", async (e) => {
             if (e.target && e.target.textContent.trim() === "Add New") {
