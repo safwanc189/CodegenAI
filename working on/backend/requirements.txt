@@ -1,5 +1,0 @@
-fastapi
-uvicorn
-python-multipart
-pypdf2          # for PDF synopsis reading
-python-docx     # for .doc/.docx support

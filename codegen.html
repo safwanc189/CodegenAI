@@ -863,14 +863,11 @@
                         <input id="edit-features" class="edit-input">
 
                         <label>Modules & Components</label>
-                        <textarea id="edit-modules" class="edit-input" placeholder="
-Student Module:
- - Student Profile Management
- - Attendance Tracking
-Teacher Module:
- - Teacher Profile Management
- - Attendance Review
-    "></textarea>
+                        <div id="module-editor"></div>
+
+                        <button id="add-module-btn" class="btn btn-primary" style="margin-top:10px;">
+                            + Add Module
+                        </button>
 
                         <label>Tech Stack (comma separated)</label>
                         <input id="edit-tech" class="edit-input">
@@ -1160,6 +1157,7 @@ Teacher Module:
 
     <script>
         const BACKEND_URL = "http://127.0.0.1:8000";
+        let selectedWireframePage = null;
         function normalizeNavText(str) {
             return str
                 .split(",")
@@ -1356,16 +1354,25 @@ Teacher Module:
                     p.features?.map(f => `<li>${f}</li>`).join("")
 
                 document.getElementById("p-modules").innerHTML =
-                    p.modules?.map(m => `
-        <li>
-            <strong>${m.name}</strong>
-            ${m.components && m.components.length ? `
-                <ul style="margin-left:15px; list-style-type:circle;">
-                    ${m.components.map(c => `<li>${c}</li>`).join("")}
-                </ul>
-            ` : ""}
+                    (p.modules || []).map(m => `
+<li>
+    <strong>${m.name || ""}</strong>
+
+    <ul style="margin-left:20px;">
+        <li><b>Fields:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.fields || []).map(f => `<li>${f}</li>`).join("")}
+            </ul>
         </li>
-    `).join("") || "<li>No modules</li>";
+
+        <li><b>Actions:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.actions || []).map(a => `<li>${a}</li>`).join("")}
+            </ul>
+        </li>
+    </ul>
+</li>
+`).join("") || "<li>No modules</li>";
 
                 document.getElementById("p-tech").innerHTML =
                     p.tech_stack?.map(t => `<li>${t}</li>`).join("") || "<li>No tech stack</li>";
@@ -1394,6 +1401,126 @@ Teacher Module:
             }
         }
 
+        function renderModuleEditor(modules) {
+            const container = document.getElementById("module-editor");
+            container.innerHTML = "";
+
+            modules.forEach((mod, index) => {
+                const block = document.createElement("div");
+                block.className = "module-block";
+                block.style = `
+            border:1px solid #ccc;
+            border-radius:8px;
+            padding:10px;
+            margin-bottom:12px;
+            background:#fafafa;
+        `;
+
+                block.innerHTML = `
+            <label>Module Name</label>
+            <input class="mod-name" value="${mod.name}" style="width:100%;margin-bottom:8px">
+
+            <label>Fields</label>
+            <div class="fields-list">
+                ${mod.fields
+                        .map((f, i) => `
+                    <div class="field-row" style="display:flex; gap:10px; margin-bottom:6px;">
+                        <input class="field-input" value="${f}" style="flex:1;">
+                        <button class="btn btn-warning delete-field" data-m="${index}" data-f="${i}">
+                            Delete
+                        </button>
+                    </div>
+                `).join("")}
+            </div>
+            <button class="btn btn-primary add-field" data-m="${index}" style="margin-bottom:12px;">
+                + Add Field
+            </button>
+
+            <label>Actions</label>
+            <div class="actions-list">
+                ${mod.actions
+                        .map((a, i) => `
+                    <div class="action-row" style="display:flex; gap:10px; margin-bottom:6px;">
+                        <input class="action-input" value="${a}" style="flex:1;">
+                        <button class="btn btn-warning delete-action" data-m="${index}" data-a="${i}">
+                            Delete
+                        </button>
+                    </div>
+                `).join("")}
+            </div>
+            <button class="btn btn-primary add-action" data-m="${index}" style="margin-bottom:12px;">
+                + Add Action
+            </button>
+
+            <button class="btn btn-warning remove-module" data-index="${index}">
+                Remove Module
+            </button>
+        `;
+
+                container.appendChild(block);
+            });
+
+            // ---- EVENT HANDLERS (MUST BE INSIDE THIS FUNCTION) ----
+
+            // ADD FIELD
+            document.querySelectorAll(".add-field").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    modules[m].fields.push("New Field");
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // DELETE FIELD
+            document.querySelectorAll(".delete-field").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    let f = btn.dataset.f;
+                    modules[m].fields.splice(f, 1);
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // ADD ACTION
+            document.querySelectorAll(".add-action").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    modules[m].actions.push("New Action");
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // DELETE ACTION
+            document.querySelectorAll(".delete-action").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    let a = btn.dataset.a;
+                    modules[m].actions.splice(a, 1);
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // REMOVE MODULE
+            document.querySelectorAll(".remove-module").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let i = btn.dataset.index;
+                    modules.splice(i, 1);
+                    renderModuleEditor(modules);
+                });
+            });
+        }
+
+
+        document.getElementById("add-module-btn").addEventListener("click", () => {
+            window.editModules.push({
+                name: "New Module",
+                fields: ["Field1"],
+                actions: ["Action1"]
+            });
+
+            renderModuleEditor(window.editModules);
+        });
+
         document.getElementById("edit-project-btn").addEventListener("click", () => {
             const p = window.lastProjectData;
 
@@ -1401,7 +1528,8 @@ Teacher Module:
             document.getElementById("edit-title").value = p.title || "";
             document.getElementById("edit-description").value = p.description || "";
             document.getElementById("edit-features").value = (p.features || []).join(", ");
-            document.getElementById("edit-modules").value = JSON.stringify(p.modules, null, 2);
+            window.editModules = JSON.parse(JSON.stringify(p.modules));
+            renderModuleEditor(window.editModules);
             document.getElementById("edit-tech").value = (p.tech_stack || []).join(", ");
             document.getElementById("edit-platform").value = p.target_platform || "";
             document.getElementById("edit-summary").value = p.ai_summary || "";
@@ -1410,15 +1538,29 @@ Teacher Module:
         });
 
         document.getElementById("save-edit-btn").addEventListener("click", async () => {
+
+            const updatedModules =
+                Array.from(document.querySelectorAll(".module-block")).map(block => ({
+                    name: block.querySelector(".mod-name").value,
+
+                    fields: Array.from(block.querySelectorAll(".field-input"))
+                        .map(f => f.value.trim())
+                        .filter(Boolean),
+
+                    actions: Array.from(block.querySelectorAll(".action-input"))
+                        .map(a => a.value.trim())
+                        .filter(Boolean)
+                }));
+
             const updated = {
                 title: document.getElementById("edit-title").value,
                 description: document.getElementById("edit-description").value,
                 features: document.getElementById("edit-features").value.split(",").map(x => x.trim()),
-                modules: parseModules(document.getElementById("edit-modules").value),
+                modules: updatedModules,   // ← NOW UPDATED CORRECTLY
                 tech_stack: document.getElementById("edit-tech").value.split(",").map(x => x.trim()),
                 target_platform: document.getElementById("edit-platform").value,
                 ai_summary: document.getElementById("edit-summary").value
-            };
+            };;
 
             // Update preview instantly
             document.getElementById("p-title").textContent = updated.title;
@@ -1429,13 +1571,25 @@ Teacher Module:
             document.getElementById("p-features").innerHTML = updated.features.map(f => `<li>${f}</li>`).join("");
 
             document.getElementById("p-modules").innerHTML =
-                updated.modules.map(m => `
-            <li><strong>${m.name}</strong>
-                <ul style="margin-left:20px;">
-                ${m.components.map(c => `<li>${c}</li>`).join("")}
-                </ul>
-            </li>
-        `).join("");
+                (updated.modules || []).map(m => `
+<li>
+    <strong>${m.name || ""}</strong>
+
+    <ul style="margin-left:20px;">
+        <li><b>Fields:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.fields || []).map(f => `<li>${f}</li>`).join("")}
+            </ul>
+        </li>
+
+        <li><b>Actions:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.actions || []).map(a => `<li>${a}</li>`).join("")}
+            </ul>
+        </li>
+    </ul>
+</li>
+`).join("") || "<li>No modules</li>";
 
             document.getElementById("p-tech").innerHTML =
                 updated.tech_stack.map(t => `<li>${t}</li>`).join("");
@@ -1699,6 +1853,21 @@ Teacher Module:
                 }
             });
 
+            // clickable sidebar
+            document.querySelectorAll(".nav-item").forEach(item => {
+                item.addEventListener("click", () => {
+                    selectedWireframePage = item.dataset.page;
+
+                    // highlight active
+                    document.querySelectorAll(".nav-item").forEach(i =>
+                        i.classList.remove("active")
+                    );
+                    item.classList.add("active");
+
+                    renderAIWireframePreview(w);
+                });
+            });
+
             // ---- SIDEBAR LAYOUT ----
             if (layout === "sidebar") {
                 preview.innerHTML = `
@@ -1708,22 +1877,32 @@ Teacher Module:
                 <aside style="width:240px;background:${primary};color:white;padding:20px;">
                     <h3 style="margin-bottom:20px;">${w.app_name || w.appName || w.title || 'App'}</h3>
                     ${(navigation || []).map(n => `
-                        <div style="padding:10px 0;font-size:16px;">
-                            ${n.icon ? n.icon : '📌'} ${n.label || n.title || n.name || ''}
-                        </div>
-                    `).join("")}
+    <div class="nav-item" data-page="${n.id || n.label.toLowerCase().replace(/\s+/g, '')}"
+         style="padding:10px 0;font-size:16px;cursor:pointer;">
+        ${n.icon ? n.icon : '📌'} ${n.label}
+    </div>
+`).join("")}
                 </aside>
 
                 <main style="flex:1;background:#fafafa;padding:20px;">
-                    ${Object.keys(pages).map(pid => {
-                    const page = pages[pid];
-                    return `
-                            <h2 style="margin-bottom:15px;color:${primary};">${page.title}</h2>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
-                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
-                            </div>
-                        `;
-                }).join("")}
+                    ${(() => {
+                        const pid = selectedWireframePage || Object.keys(pages)[0];
+                        const page = pages[pid];
+
+                        if (!page) return "<p>No page found</p>";
+
+                        return `
+        <h2 style="margin-bottom:15px;color:${primary};">${page.title}</h2>
+
+        <div style="display:grid;
+                    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+                    gap:12px;">
+            ${(page.components || []).map(c =>
+                            renderComponent(c, primary, radius, shadow)
+                        ).join("")}
+        </div>
+    `;
+                    })()}
                 </main>
             </div>
         `;
@@ -1732,29 +1911,44 @@ Teacher Module:
 
             // ---- TOP NAV LAYOUT ----
             if (layout === "topnav" || layout === "dashboard") {
+
                 preview.innerHTML = `
-            <div style="border:1px solid #ddd;border-radius:${radius}px;box-shadow:${shadow};overflow:hidden;">
-                <header style="background:${primary};color:white;padding:15px 20px;">
-                    <h2 style="margin:0;">${w.app_name || 'App'}</h2>
-                </header>
+        <div style="border:1px solid #ddd;border-radius:${radius}px;box-shadow:${shadow};overflow:hidden;">
 
-                <nav style="display:flex;gap:20px;background:#f1f3f5;padding:12px 20px;border-bottom:1px solid #ddd;">
-                    ${(navigation || []).map(n => `<div style="font-weight:600;">${n.label || n.title || ''}</div>`).join("")}
-                </nav>
+            <header style="background:${primary};color:white;padding:15px 20px;">
+                <h2 style="margin:0;">${w.app_name || 'App'}</h2>
+            </header>
 
-                <div style="padding:20px;">
-                    ${Object.keys(pages).map(pid => {
-                    const page = pages[pid];
-                    return `
-                            <h2 style="color:${primary};">${page.title}</h2>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:15px;">
-                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
-                            </div>
-                        `;
-                }).join("")}
-                </div>
+            <nav style="display:flex;gap:20px;background:#f1f3f5;padding:12px 20px;border-bottom:1px solid #ddd;">
+                ${(navigation || []).map(n => `
+                    <div class="nav-item"
+                         data-page="${n.id || n.label.toLowerCase().replace(/\\s+/g, '')}"
+                         style="cursor:pointer;font-weight:600;">
+                         ${n.label}
+                    </div>
+                `).join("")}
+            </nav>
+
+            <div style="padding:20px;">
+                ${(() => {
+                        const pid = selectedWireframePage || Object.keys(pages)[0];
+                        const page = pages[pid];
+                        if (!page) return "<p>No page found</p>";
+
+                        return `
+                        <h2 style="color:${primary};">${page.title}</h2>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:15px;">
+                            ${(page.components || []).map(c =>
+                            renderComponent(c, primary, radius, shadow)
+                        ).join("")}
+                        </div>
+                    `;
+                    })()}
             </div>
-        `;
+
+        </div>
+    `;
+
                 return;
             }
 
@@ -2624,6 +2818,12 @@ const styles = StyleSheet.create({
             justify-content: center;
             align-items: center;
             z-index: 5000;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-weight: bold;
         }
 
         .loader-box {

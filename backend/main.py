@@ -105,7 +105,10 @@ async def upload_synopsis(
     text = await process_synopsis(synopsis, file)
 
     # STEP 2: Ask LLaMA to return structured project metadata
-    project_data = await llama_structured_project(text, tech)
+    from services.project_parser import parse_structured_project
+
+    project_data = parse_structured_project(text)
+    project_data["tech_stack"] = [tech]
 
     # -----------------------------------------------------------
     # ✅ STEP 3: Normalize keys to match frontend requirements
@@ -247,9 +250,10 @@ async def update_project(project_id: str = Form(...), project: str = Form(...)):
     """
     Saves updated project details (title, description, features, modules, etc.)
     from Step-2 Edit Form.
+    Always returns success if project exists — even when nothing changed.
     """
     try:
-        updated_data = json.loads(project)   # convert string → dict
+        updated_data = json.loads(project)
         oid = ObjectId(project_id)
 
         result = await collection.update_one(
@@ -257,17 +261,18 @@ async def update_project(project_id: str = Form(...), project: str = Form(...)):
             {"$set": updated_data}
         )
 
-        if result.modified_count > 0:
-            print(f"✅ [DB] Project updated: {project_id}")
+        # SUCCESS if document exists, even if nothing changed
+        if result.matched_count == 1:
+            print(f"✅ [DB] Project updated (modified: {result.modified_count}) → {project_id}")
             return {"success": True, "message": "Project updated successfully"}
-        else:
-            print(f"⚠️ [DB] No modification for: {project_id}")
-            return {"success": False, "message": "Nothing changed"}
+
+        # If document doesn't exist
+        print(f"❌ [DB] Project not found for update: {project_id}")
+        return {"success": False, "error": "Project not found"}
 
     except Exception as e:
         print("❌ [Update Project ERROR]:", e)
         return {"success": False, "error": str(e)}
-
 # =============================================================================
 # 🧱 API: Generate Wireframe Layout (AI call)
 # =============================================================================
