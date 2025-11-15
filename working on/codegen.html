@@ -1,0 +1,2809 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynopsisAI - Advanced Multi-Step Code Generation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            background-color: white;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        textarea,
+        select,
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus,
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .tech-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-option {
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tech-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .tech-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .tech-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+
+        .btn-large {
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray);
+            color: white;
+        }
+
+        .code-output {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .copy-btn {
+            background-color: transparent;
+            border: 1px solid #e2e8f0;
+            color: #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .history-section {
+            margin-top: 3rem;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .history-item {
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-details {
+            display: flex;
+            gap: 1rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--light);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #495057;
+            color: #adb5bd;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: var(--light-gray);
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .step.active .step-label {
+            color: var(--primary);
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--light-gray);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .file-upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .api-list {
+            margin-top: 1rem;
+        }
+
+        .api-item {
+            padding: 1rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            background-color: white;
+        }
+
+        .api-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .api-method {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .method-get {
+            background-color: #10b981;
+        }
+
+        .method-post {
+            background-color: #3b82f6;
+        }
+
+        .method-put {
+            background-color: #f59e0b;
+        }
+
+        .method-delete {
+            background-color: #ef4444;
+        }
+
+        .api-path {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .api-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .code-preview {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .file-tree {
+            background-color: white;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--light-gray);
+        }
+
+        .file-tree ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .file-tree li {
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .file-tree li:hover {
+            color: var(--primary);
+        }
+
+        .file-tree i {
+            margin-right: 0.5rem;
+        }
+
+        .download-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .download-option {
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .download-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .download-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .download-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .wireframe-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .wireframe-preview {
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: white;
+        }
+
+        .wireframe-edit {
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: white;
+        }
+
+        .wireframe-box {
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f8f9fa;
+        }
+
+        .wireframe-header {
+            height: 60px;
+            background-color: var(--primary);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            color: white;
+        }
+
+        .wireframe-sidebar {
+            width: 200px;
+            height: 400px;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+            padding: 1rem;
+            float: left;
+            margin-right: 1rem;
+        }
+
+        .wireframe-content {
+            height: 400px;
+            background-color: white;
+            border-radius: 4px;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .wireframe-element {
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .edit-controls {
+            margin-top: 1rem;
+        }
+
+        .edit-control {
+            margin-bottom: 1rem;
+        }
+
+        .edit-control label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .edit-control input,
+        .edit-control select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .step-indicator {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .wireframe-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <h1>SynopsisAI</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Examples</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Documentation</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="btn btn-outline">Sign In</button>
+                    <button class="btn btn-primary">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Advanced AI-Powered Multi-Step Code Generation</h2>
+            <p>Transform your project synopsis into fully functional code with our guided process, including UI
+                wireframing and API design.</p>
+            <button class="btn btn-primary btn-large" id="start-process-btn">Start Process</button>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="container">
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Upload Synopsis</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Confirm Synopsis</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">UI Wireframe</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Generate APIs</div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Confirm APIs</div>
+                </div>
+                <div class="step" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-label">Generate Code</div>
+                </div>
+                <div class="step" data-step="7">
+                    <div class="step-number">7</div>
+                    <div class="step-label">Download</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Upload Synopsis -->
+            <div class="step-content active" id="step-1">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upload Project Synopsis</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="synopsis">Project Synopsis / Description</label>
+                        <textarea id="synopsis"
+                            placeholder="Describe your project requirements in detail..."></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Or Upload File</label>
+                        <div class="file-upload-area" id="file-upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag & Drop your file here</h3>
+                            <p>Supported formats: .txt, .doc, .docx, .pdf</p>
+                            <input type="file" id="file-upload" hidden>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Technology Stack</label>
+                        <div class="tech-options">
+                            <div class="tech-option selected" data-tech="mern">
+                                <div class="tech-icon">⚛️</div>
+                                <div>MERN Stack</div>
+                            </div>
+                            <div class="tech-option" data-tech="nextjs">
+                                <div class="tech-icon">▲</div>
+                                <div>Next.js</div>
+                            </div>
+                            <div class="tech-option" data-tech="python-django">
+                                <div class="tech-icon">🐍</div>
+                                <div>Python Django</div>
+                            </div>
+                            <div class="tech-option" data-tech="php">
+                                <div class="tech-icon">🐘</div>
+                                <div>PHP</div>
+                            </div>
+                            <div class="tech-option" data-tech="flutter">
+                                <div class="tech-icon">💙</div>
+                                <div>Flutter</div>
+                            </div>
+                            <div class="tech-option" data-tech="react-native">
+                                <div class="tech-icon">📱</div>
+                                <div>React Native</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-large" id="next-to-step-2">Next: Confirm Synopsis</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Confirm Synopsis -->
+            <div class="step-content" id="step-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Confirm Your Project Overview</h3>
+                    </div>
+
+                    <div id="project-details" style="padding: 1rem;">
+                        <h4>📌 Project Title</h4>
+                        <p id="p-title" class="preview-field"></p>
+
+                        <h4>📝 Description</h4>
+                        <p id="p-description" class="preview-field"></p>
+
+                        <h4>✨ Features</h4>
+                        <ul id="p-features"></ul>
+
+                        <h4>📦 Modules</h4>
+                        <ul id="p-modules"></ul>
+
+                        <h4>💻 Tech Stack</h4>
+                        <ul id="p-tech"></ul>
+
+                        <h4>🎯 Target Platform</h4>
+                        <p id="p-platform" class="preview-field"></p>
+
+                        <!-- <h4>🎨 UI Preferences</h4>
+                        <p><b>Layout:</b> <span id="p-layout"></span></p>
+                        <p><b>Color Scheme:</b> <span id="p-color-scheme"></span></p>
+                        <p><b>Primary Color:</b> <span id="p-primary-color"></span></p> -->
+
+                        <h4>🤖 AI Summary</h4>
+                        <p id="p-summary" class="preview-field"></p>
+                    </div>
+
+                    <button class="btn btn-outline" id="edit-project-btn"
+                        style="margin-top: 1rem; color:#333; border-color:#333;">
+                        <i class="fas fa-edit"></i> Edit Project
+                    </button>
+
+                    <!-- ================= EDIT PROJECT FORM ================= -->
+                    <div id="edit-form"
+                        style="display:none; margin-top:20px; padding:1rem; border:1px solid #ddd; border-radius:8px;">
+
+                        <h3>✏️ Edit Project</h3>
+
+                        <label>Project Title</label>
+                        <input id="edit-title" class="edit-input">
+
+                        <label>Description</label>
+                        <textarea id="edit-description" class="edit-input"></textarea>
+
+                        <label>Features (comma separated)</label>
+                        <input id="edit-features" class="edit-input">
+
+                        <label>Modules & Components</label>
+                        <div id="module-editor"></div>
+
+                        <button id="add-module-btn" class="btn btn-primary" style="margin-top:10px;">
+                            + Add Module
+                        </button>
+
+                        <label>Tech Stack (comma separated)</label>
+                        <input id="edit-tech" class="edit-input">
+
+                        <label>Target Platform</label>
+                        <input id="edit-platform" class="edit-input">
+
+                        <label>AI Summary</label>
+                        <textarea id="edit-summary" class="edit-input"></textarea>
+
+                        <button id="save-edit-btn" class="btn btn-primary" style="margin-top:10px;">
+                            Save Changes
+                        </button>
+                    </div>
+                    <!-- ====================================================== -->
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-large" id="back-to-step-1">Back</button>
+                        <button class="btn btn-primary btn-large" id="next-to-step-3">Next: Generate UI
+                            Wireframe</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Step 3: UI Wireframe -->
+            <div class="step-content" id="step-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">UI Wireframe Confirmation & Editing</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <p>Based on your project description, we've generated a UI wireframe. You can customize it
+                            below:</p>
+
+                        <div class="wireframe-container" id="wireframe-container" style="display:none;">
+                            <div class="wireframe-preview">
+                                <h4>Wireframe Preview</h4>
+                                <div class="wireframe-box"></div>
+                            </div>
+
+                            <div class="wireframe-edit">
+                                <h4>Customize Wireframe</h4>
+                                <div class="edit-controls">
+                                    <div class="edit-control">
+                                        <label for="layout-type">Layout Type</label>
+                                        <select id="layout-type">
+                                            <option value="sidebar">Sidebar Layout</option>
+                                            <option value="topnav">Top Navigation</option>
+                                            <option value="dashboard">Dashboard</option>
+                                            <option value="mobile">Mobile App</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="edit-control">
+                                        <label for="color-scheme">Color Scheme</label>
+                                        <select id="color-scheme">
+                                            <option value="blue">Blue</option>
+                                            <option value="green">Green</option>
+                                            <option value="purple">Purple</option>
+                                            <option value="dark">Dark</option>
+                                            <!-- Add these -->
+                                            <option value="orange">Orange</option>
+                                            <option value="yellow">Yellow</option>
+                                            <option value="pink">Pink</option>
+                                            <option value="teal">Teal</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="edit-control">
+                                        <label for="primary-color">Primary Color</label>
+                                        <input type="color" id="primary-color" value="#4361ee">
+                                    </div>
+
+                                    <div class="edit-control">
+                                        <label for="app-name">Application Name</label>
+                                        <input type="text" id="app-name" value="My Application">
+                                    </div>
+
+
+                                </div>
+
+                                <button class="btn btn-primary" id="update-wireframe-btn">
+                                    <i class="fas fa-sync-alt"></i> Update Wireframe
+                                </button>
+                                <div id="updateLoader"
+                                    style="display:none; margin-top:10px; font-weight:600; color:#6b46c1;">
+                                    Updating wireframe… Please wait...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-large" id="back-to-step-2">Back</button>
+                        <button class="btn btn-primary btn-large" id="next-to-step-4">Next: Generate APIs</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Generate APIs -->
+            <div class="step-content" id="step-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Generating APIs</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <p>Based on your project description and UI wireframe, we're generating the required APIs...</p>
+                        <div id="api-generation-progress">
+                            <div class="progress-bar"
+                                style="height: 10px; background-color: #e9ecef; border-radius: 5px; margin: 1rem 0;">
+                                <div id="progress-fill"
+                                    style="height: 100%; width: 0%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s;">
+                                </div>
+                            </div>
+                            <p id="progress-text">Analyzing requirements...</p>
+                        </div>
+                    </div>
+
+                    <div class="api-list" id="api-list" style="display: none;">
+                        <!-- APIs will be generated here -->
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-large" id="back-to-step-3">Back</button>
+                        <button class="btn btn-primary btn-large" id="next-to-step-5" style="display: none;">Next:
+                            Confirm APIs</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Confirm APIs -->
+            <div class="step-content" id="step-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Confirm Generated APIs</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <p>Review the generated APIs and make any necessary adjustments:</p>
+                        <div class="api-list" id="api-confirm-list">
+                            <!-- APIs for confirmation will appear here -->
+                        </div>
+
+                        <div class="input-group" style="margin-top: 2rem;">
+                            <button class="btn btn-outline" id="add-api-btn">
+                                <i class="fas fa-plus"></i> Add New API
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-large" id="back-to-step-4">Back</button>
+                        <button class="btn btn-primary btn-large" id="next-to-step-6">Next: Generate Full Code</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Generate Code -->
+            <div class="step-content" id="step-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Generating Full Codebase</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <p>We're now generating the complete codebase based on your confirmed APIs and UI wireframe...
+                        </p>
+                        <div id="code-generation-progress">
+                            <div class="progress-bar"
+                                style="height: 10px; background-color: #e9ecef; border-radius: 5px; margin: 1rem 0;">
+                                <div id="code-progress-fill"
+                                    style="height: 100%; width: 0%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s;">
+                                </div>
+                            </div>
+                            <p id="code-progress-text">Setting up project structure...</p>
+                        </div>
+                    </div>
+
+                    <div class="file-tree" id="file-tree" style="display: none;">
+                        <h4>Project Structure</h4>
+                        <ul id="file-tree-list">
+                            <!-- File tree will be generated here -->
+                        </ul>
+                    </div>
+
+                    <div class="code-preview" id="code-preview" style="display: none;">
+                        <div class="output-header">
+                            <div>server.js</div>
+                            <button class="copy-btn">Copy Code</button>
+                        </div>
+                        <pre><code id="preview-code">// Code preview will appear here</code></pre>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-large" id="back-to-step-5">Back</button>
+                        <button class="btn btn-primary btn-large" id="next-to-step-7" style="display: none;">Next:
+                            Download Code</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7: Download Code -->
+            <div class="step-content" id="step-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Download Your Generated Code</h3>
+                    </div>
+
+                    <div class="input-group">
+                        <p>Your code has been successfully generated! Choose your preferred download option:</p>
+
+                        <div class="download-options">
+                            <div class="download-option selected" data-format="zip">
+                                <div class="download-icon"><i class="fas fa-file-archive"></i></div>
+                                <div>ZIP Archive</div>
+                                <small>Complete project in a ZIP file</small>
+                            </div>
+                            <div class="download-option" data-format="github">
+                                <div class="download-icon"><i class="fab fa-github"></i></div>
+                                <div>GitHub Repository</div>
+                                <small>Push directly to GitHub</small>
+                            </div>
+                            <div class="download-option" data-format="docker">
+                                <div class="download-icon"><i class="fab fa-docker"></i></div>
+                                <div>Docker Container</div>
+                                <small>Ready-to-run container</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="project-name">Project Name</label>
+                        <input type="text" id="project-name" placeholder="Enter your project name">
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-large" id="back-to-step-6">Back</button>
+                        <button class="btn btn-success btn-large" id="download-btn">Download Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SynopsisAI</h3>
+                    <p>Advanced AI-powered code generation for developers and teams.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 SynopsisAI. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const BACKEND_URL = "http://127.0.0.1:8000";
+        function normalizeNavText(str) {
+            return str
+                .split(",")
+                .map(s => s.trim().toLowerCase().replace(/\s+/g, ""))
+                .filter(s => s.length)
+                .join(",");
+        }
+        // DOM Elements
+        const stepContents = document.querySelectorAll('.step-content');
+        const steps = document.querySelectorAll('.step');
+        const startProcessBtn = document.getElementById('start-process-btn');
+        const nextToStep2Btn = document.getElementById('next-to-step-2');
+        const nextToStep3Btn = document.getElementById('next-to-step-3');
+        const nextToStep4Btn = document.getElementById('next-to-step-4');
+        const nextToStep5Btn = document.getElementById('next-to-step-5');
+        const nextToStep6Btn = document.getElementById('next-to-step-6');
+        const nextToStep7Btn = document.getElementById('next-to-step-7');
+        const backToStep1Btn = document.getElementById('back-to-step-1');
+        const backToStep2Btn = document.getElementById('back-to-step-2');
+        const backToStep3Btn = document.getElementById('back-to-step-3');
+        const backToStep4Btn = document.getElementById('back-to-step-4');
+        const backToStep5Btn = document.getElementById('back-to-step-5');
+        const backToStep6Btn = document.getElementById('back-to-step-6');
+        const downloadBtn = document.getElementById('download-btn');
+        const fileUploadArea = document.getElementById('file-upload-area');
+        const fileUpload = document.getElementById('file-upload');
+        const techOptions = document.querySelectorAll('.tech-option');
+        const apiList = document.getElementById('api-list');
+        const apiConfirmList = document.getElementById('api-confirm-list');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const codeProgressFill = document.getElementById('code-progress-fill');
+        const codeProgressText = document.getElementById('code-progress-text');
+        const fileTree = document.getElementById('file-tree');
+        const fileTreeList = document.getElementById('file-tree-list');
+        const codePreview = document.getElementById('code-preview');
+        const previewCode = document.getElementById('preview-code');
+        const downloadOptions = document.querySelectorAll('.download-option');
+
+        const updateWireframeBtn = document.getElementById('update-wireframe-btn');
+        const addApiBtn = document.getElementById('add-api-btn');
+        // Preview elements for Step 2
+        const synopsisPreview = document.getElementById('synopsis-preview');
+        const techPreview = document.getElementById('tech-preview');
+        function showLoader() {
+            document.getElementById("global-loader").style.display = "flex";
+        }
+        function hideLoader() {
+            document.getElementById("global-loader").style.display = "none";
+        }
+
+        // Current step tracking
+        let currentStep = 1;
+
+        // Initialize the application
+        function initApp() {
+            // Set up event listeners for navigation
+            nextToStep2Btn.addEventListener('click', goToStep2);
+            nextToStep3Btn.addEventListener('click', generateWireframeStep);
+            nextToStep4Btn.addEventListener('click', goToStep4);
+            nextToStep5Btn.addEventListener('click', goToStep5);
+            nextToStep6Btn.addEventListener('click', goToStep6);
+            nextToStep7Btn.addEventListener('click', goToStep7);
+
+            backToStep1Btn.addEventListener('click', () => goToStep(1));
+            backToStep2Btn.addEventListener('click', () => goToStep(2));
+            backToStep3Btn.addEventListener('click', () => goToStep(3));
+            backToStep4Btn.addEventListener('click', () => goToStep(4));
+            backToStep5Btn.addEventListener('click', () => goToStep(5));
+            backToStep6Btn.addEventListener('click', () => goToStep(6));
+
+            startProcessBtn.addEventListener('click', () => goToStep(1));
+            downloadBtn.addEventListener('click', downloadCode);
+
+            // File upload area click
+            fileUploadArea.addEventListener('click', () => fileUpload.click());
+
+            // File upload change
+            fileUpload.addEventListener('change', handleFileUpload);
+
+            // Technology selection
+            techOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    techOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+
+            // Download options selection
+            downloadOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    downloadOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+
+            // Edit buttons
+            // Edit Project button (Step 2)
+
+            updateWireframeBtn.addEventListener('click', updateWireframe);
+            addApiBtn.addEventListener('click', addNewAPI);
+        }
+
+        // Navigation functions
+        function goToStep(step) {
+            // Hide all step contents
+            stepContents.forEach(content => content.classList.remove('active'));
+
+            // Update steps
+            steps.forEach(s => {
+                s.classList.remove('active');
+                if (parseInt(s.dataset.step) < step) {
+                    s.classList.add('completed');
+                } else if (parseInt(s.dataset.step) === step) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('completed');
+                }
+            });
+
+            // Show current step content
+            document.getElementById(`step-${step}`).classList.add('active');
+            currentStep = step;
+
+            // Initialize step-specific content
+
+        }
+
+        async function goToStep2() {
+            const synopsis = document.getElementById('synopsis').value;
+            const selectedTechOption = document.querySelector('.tech-option.selected');
+            const file = document.getElementById('file-upload').files[0];
+            const btn = document.getElementById('next-to-step-2');
+
+            if (!synopsis && !file) {
+                alert('Please enter or upload a synopsis.');
+                return;
+            }
+
+            if (!selectedTechOption) {
+                alert('Please select a technology stack.');
+                return;
+            }
+
+            const selectedTech = selectedTechOption.dataset.tech;
+            const formData = new FormData();
+            formData.append("tech", selectedTech);
+            if (synopsis) formData.append("synopsis", synopsis);
+            if (file) formData.append("file", file);
+
+            try {
+                // 🔥 Show loading overlay
+                showLoader();
+
+                // 🔥 Disable button + show spinner text
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
+                const res = await fetch(`${BACKEND_URL}/api/upload-synopsis`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    console.warn("Backend responded but not OK:", res.status);
+                    // Allow to continue if response still contains JSON
+                }
+
+                const data = await res.json();
+
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    return;
+                }
+
+                // Fill Step-2 fields (already done in your code)
+                const p = data.project;
+
+                window.lastProjectId = data.project_id;
+                window.lastProjectData = p;
+
+                const setText = (id, value) =>
+                    document.getElementById(id).textContent = value || "Not Available";
+
+                setText("p-title", p.title);
+                setText("p-description", p.description);
+                setText("p-platform", p.target_platform);
+                setText("p-summary", p.ai_summary);
+                // setText("p-layout", p.ui_preferences?.layout_type);
+                // setText("p-color-scheme", p.ui_preferences?.color_scheme);
+                // setText("p-primary-color", p.ui_preferences?.primary_color);
+
+                document.getElementById("p-features").innerHTML =
+                    p.features?.map(f => `<li>${f}</li>`).join("")
+
+                document.getElementById("p-modules").innerHTML =
+                    (p.modules || []).map(m => `
+<li>
+    <strong>${m.name || ""}</strong>
+
+    <ul style="margin-left:20px;">
+        <li><b>Fields:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.fields || []).map(f => `<li>${f}</li>`).join("")}
+            </ul>
+        </li>
+
+        <li><b>Actions:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.actions || []).map(a => `<li>${a}</li>`).join("")}
+            </ul>
+        </li>
+    </ul>
+</li>
+`).join("") || "<li>No modules</li>";
+
+                document.getElementById("p-tech").innerHTML =
+                    p.tech_stack?.map(t => `<li>${t}</li>`).join("") || "<li>No tech stack</li>";
+
+                // Go to step 2
+                goToStep(2);
+
+            } catch (err) {
+                console.error("Upload error:", err);
+                alert("🚫 Cannot connect to backend.");
+            } finally {
+                // 🔥 Re-enable button, reset UI, hide loader
+                hideLoader();
+                btn.disabled = false;
+                btn.innerHTML = "Next: Confirm Synopsis";
+            }
+        }
+
+        function parseModules(text) {
+            // Expecting JSON string for now
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                alert("Module format invalid. Use JSON format.");
+                return [];
+            }
+        }
+
+        function renderModuleEditor(modules) {
+            const container = document.getElementById("module-editor");
+            container.innerHTML = "";
+
+            modules.forEach((mod, index) => {
+                const block = document.createElement("div");
+                block.className = "module-block";
+                block.style = `
+            border:1px solid #ccc;
+            border-radius:8px;
+            padding:10px;
+            margin-bottom:12px;
+            background:#fafafa;
+        `;
+
+                block.innerHTML = `
+            <label>Module Name</label>
+            <input class="mod-name" value="${mod.name}" style="width:100%;margin-bottom:8px">
+
+            <label>Fields</label>
+            <div class="fields-list">
+                ${mod.fields
+                        .map((f, i) => `
+                    <div class="field-row" style="display:flex; gap:10px; margin-bottom:6px;">
+                        <input class="field-input" value="${f}" style="flex:1;">
+                        <button class="btn btn-warning delete-field" data-m="${index}" data-f="${i}">
+                            Delete
+                        </button>
+                    </div>
+                `).join("")}
+            </div>
+            <button class="btn btn-primary add-field" data-m="${index}" style="margin-bottom:12px;">
+                + Add Field
+            </button>
+
+            <label>Actions</label>
+            <div class="actions-list">
+                ${mod.actions
+                        .map((a, i) => `
+                    <div class="action-row" style="display:flex; gap:10px; margin-bottom:6px;">
+                        <input class="action-input" value="${a}" style="flex:1;">
+                        <button class="btn btn-warning delete-action" data-m="${index}" data-a="${i}">
+                            Delete
+                        </button>
+                    </div>
+                `).join("")}
+            </div>
+            <button class="btn btn-primary add-action" data-m="${index}" style="margin-bottom:12px;">
+                + Add Action
+            </button>
+
+            <button class="btn btn-warning remove-module" data-index="${index}">
+                Remove Module
+            </button>
+        `;
+
+                container.appendChild(block);
+            });
+
+            // ---- EVENT HANDLERS (MUST BE INSIDE THIS FUNCTION) ----
+
+            // ADD FIELD
+            document.querySelectorAll(".add-field").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    modules[m].fields.push("New Field");
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // DELETE FIELD
+            document.querySelectorAll(".delete-field").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    let f = btn.dataset.f;
+                    modules[m].fields.splice(f, 1);
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // ADD ACTION
+            document.querySelectorAll(".add-action").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    modules[m].actions.push("New Action");
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // DELETE ACTION
+            document.querySelectorAll(".delete-action").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let m = btn.dataset.m;
+                    let a = btn.dataset.a;
+                    modules[m].actions.splice(a, 1);
+                    renderModuleEditor(modules);
+                });
+            });
+
+            // REMOVE MODULE
+            document.querySelectorAll(".remove-module").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    let i = btn.dataset.index;
+                    modules.splice(i, 1);
+                    renderModuleEditor(modules);
+                });
+            });
+        }
+
+
+        document.getElementById("add-module-btn").addEventListener("click", () => {
+            window.editModules.push({
+                name: "New Module",
+                fields: ["Field1"],
+                actions: ["Action1"]
+            });
+
+            renderModuleEditor(window.editModules);
+        });
+
+        document.getElementById("edit-project-btn").addEventListener("click", () => {
+            const p = window.lastProjectData;
+
+            // Fill edit fields
+            document.getElementById("edit-title").value = p.title || "";
+            document.getElementById("edit-description").value = p.description || "";
+            document.getElementById("edit-features").value = (p.features || []).join(", ");
+            window.editModules = JSON.parse(JSON.stringify(p.modules));
+            renderModuleEditor(window.editModules);
+            document.getElementById("edit-tech").value = (p.tech_stack || []).join(", ");
+            document.getElementById("edit-platform").value = p.target_platform || "";
+            document.getElementById("edit-summary").value = p.ai_summary || "";
+
+            document.getElementById("edit-form").style.display = "block";
+        });
+
+        document.getElementById("save-edit-btn").addEventListener("click", async () => {
+
+            const updatedModules =
+                Array.from(document.querySelectorAll(".module-block")).map(block => ({
+                    name: block.querySelector(".mod-name").value,
+
+                    fields: Array.from(block.querySelectorAll(".field-input"))
+                        .map(f => f.value.trim())
+                        .filter(Boolean),
+
+                    actions: Array.from(block.querySelectorAll(".action-input"))
+                        .map(a => a.value.trim())
+                        .filter(Boolean)
+                }));
+
+            const updated = {
+                title: document.getElementById("edit-title").value,
+                description: document.getElementById("edit-description").value,
+                features: document.getElementById("edit-features").value.split(",").map(x => x.trim()),
+                modules: updatedModules,   // ← NOW UPDATED CORRECTLY
+                tech_stack: document.getElementById("edit-tech").value.split(",").map(x => x.trim()),
+                target_platform: document.getElementById("edit-platform").value,
+                ai_summary: document.getElementById("edit-summary").value
+            };;
+
+            // Update preview instantly
+            document.getElementById("p-title").textContent = updated.title;
+            document.getElementById("p-description").textContent = updated.description;
+            document.getElementById("p-platform").textContent = updated.target_platform;
+            document.getElementById("p-summary").textContent = updated.ai_summary;
+
+            document.getElementById("p-features").innerHTML = updated.features.map(f => `<li>${f}</li>`).join("");
+
+            document.getElementById("p-modules").innerHTML =
+                (updated.modules || []).map(m => `
+<li>
+    <strong>${m.name || ""}</strong>
+
+    <ul style="margin-left:20px;">
+        <li><b>Fields:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.fields || []).map(f => `<li>${f}</li>`).join("")}
+            </ul>
+        </li>
+
+        <li><b>Actions:</b>
+            <ul style="margin-left:15px; list-style-type:circle;">
+                ${(m.actions || []).map(a => `<li>${a}</li>`).join("")}
+            </ul>
+        </li>
+    </ul>
+</li>
+`).join("") || "<li>No modules</li>";
+
+            document.getElementById("p-tech").innerHTML =
+                updated.tech_stack.map(t => `<li>${t}</li>`).join("");
+
+
+            // Save to backend
+            const form = new FormData();
+            form.append("project_id", window.lastProjectId);
+            form.append("project", JSON.stringify(updated));
+
+            const res = await fetch(`${BACKEND_URL}/api/update-project`, {
+                method: "POST",
+                body: form
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                alert("✅ Project updated!");
+                document.getElementById("edit-form").style.display = "none";
+            } else {
+                alert("❌ Failed to update project.");
+            }
+        });
+
+
+        // ---------- Replace generateWireframeStep ----------
+        async function generateWireframeStep() {
+            const btn = document.getElementById("next-to-step-3");
+
+            showLoader();
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generating...`;
+
+            try {
+                let projectId = window.lastProjectId;
+                const form = new FormData();
+                form.append("project_id", projectId);
+
+                const res = await fetch(`${BACKEND_URL}/api/generate-wireframe`, {
+                    method: "POST",
+                    body: form,
+                });
+
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert("Wireframe generation failed.");
+                    return;
+                }
+
+                // REAL AI OUTPUT JSON
+                const w = data.wireframe || {};
+                window.currentWireframe = w;
+                const navKeyInit = (w.navigation || [])
+                    .map(n => (n.label || n.name || "").toLowerCase().replace(/\s+/g, ""))
+                    .join(",");
+                lastWireframe = { ...w };
+                lastWireframe.navigation_text = normalizeNavText(
+                    (w.navigation || []).map(n => n.label || n.name).join(",")
+                );
+
+
+                // Now normalize values SAFELY (after w exists)
+                const layoutType = w.layout_type || w.layout?.type || w.ui_layout || "sidebar";
+                const primaryColor = w.primary_color || w.primaryColor || w.layout?.primary_color || "#4361ee";
+                const colorScheme = w.color_scheme || w.colorScheme || "blue";
+                const nav = w.navigation || w.nav || [];
+
+                // Navigation text for change-detection
+                window.lastWireframe = window.lastWireframe || {};
+                window.lastWireframe.navigation_text =
+                    (nav || [])
+                        .map(n => (n.label || n.name || "").toLowerCase().replace(/\s+/g, ""))
+                        .join(",");
+
+                window.currentProjectId = projectId;
+
+
+
+                document.getElementById("app-name").value =
+                    lastWireframe.app_name || "My Application";
+
+                document.getElementById("layout-type").value =
+                    lastWireframe.layout_type || "sidebar";
+
+                document.getElementById("primary-color").value =
+                    lastWireframe.primary_color || "#4361ee";
+
+                document.getElementById("color-scheme").value =
+                    lastWireframe.color_scheme || "blue";
+
+                const safeSet = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = value;
+                };
+
+                safeSet("app-name", lastWireframe.app_name || "My Application");
+                safeSet("layout-type", lastWireframe.layout_type || "sidebar");
+                safeSet("primary-color", lastWireframe.primary_color || "#4361ee");
+                safeSet("color-scheme", lastWireframe.color_scheme || "blue");
+
+                // Render Preview (uses the robust renderer below)
+                renderAIWireframePreview(w);
+
+                // Show the wireframe section
+                document.getElementById("wireframe-container").style.display = "grid";
+
+                // Move user to Step 3
+                goToStep(3);
+
+            } catch (err) {
+                console.error("Wireframe Error:", err);
+                alert("Error generating wireframe.");
+            } finally {
+                hideLoader();
+                btn.disabled = false;
+                btn.innerHTML = "Next: Generate UI Wireframe";
+            }
+        }
+
+
+        // ---------- Replace renderComponent ----------
+        function renderComponent(c, primary, radius, shadow, isMobile = false) {
+            // make sure c is object and has a type
+            if (!c || typeof c !== 'object') c = { type: 'card', title: String(c || '') };
+
+            const safeTitle = c.title || c.label || c.name || '';
+            const baseStyle = `
+        padding:15px;
+        background:white;
+        border-radius:${radius}px;
+        border:1px solid #ddd;
+        box-shadow:${shadow};
+    `;
+
+            // Normalize component type aliases
+            const t = (c.type || '').toString().toLowerCase();
+            if (t === 'stat' || t === 'stat_card' || t === 'card' || t.includes('stats')) {
+                return `
+            <div style="${baseStyle}">
+                <h4 style="margin:0 0 6px 0;">${safeTitle}</h4>
+                <p style="font-size:20px;font-weight:bold;color:${primary};margin:0;">${c.value ?? c.count ?? ''}</p>
+                ${c.subtitle ? `<small style="color:${primary};opacity:.7">${c.subtitle}</small>` : ''}
+            </div>
+        `;
+            }
+
+            if (t === 'chart' || t.includes('chart')) {
+                return `
+            <div style="${baseStyle};text-align:center;">
+                <h4 style="margin-bottom:8px;">${safeTitle}</h4>
+                <div style="height:${isMobile ? 120 : 180}px;background:#e9ecef;border-radius:${radius}px;"></div>
+            </div>
+        `;
+            }
+
+            if (t === 'table' || t.includes('table')) {
+                const cols = (c.columns || []).slice(0, 4).map(col => `<th style="text-align:left;padding:6px 8px;">${col}</th>`).join("");
+                return `
+            <div style="${baseStyle}">
+                <h4 style="margin-bottom:10px;">${safeTitle}</h4>
+                <div style="overflow:auto;border-radius:${radius}px;background:#fff;border:1px solid #f1f1f1;padding:8px;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead><tr>${cols}</tr></thead>
+                        <tbody>
+                            <tr><td colspan="${Math.max(1, (c.columns || []).length)}" style="padding:12px;color:#888;">Table preview</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+            }
+
+            if (t === 'button' || t === 'cta') {
+                return `<div style="${baseStyle};display:flex;align-items:center;justify-content:center;"><button class="btn btn-primary">${c.label || safeTitle || 'Action'}</button></div>`;
+            }
+
+            // fallback simple box
+            return `<div style="${baseStyle}">${safeTitle}</div>`;
+        }
+
+
+        // ---------- Replace renderAIWireframePreview ----------
+        function renderAIWireframePreview(w) {
+            const preview = document.querySelector(".wireframe-box");
+            preview.innerHTML = "";
+
+            // Robust normalization for layout, colors, nav and pages
+            const layout = (w.layout_type || w.layout?.type || w.ui_layout || w.layoutType || 'sidebar').toString().toLowerCase();
+            // Determine final primary color
+            // Add this inside renderAIWireframePreview, at the top
+            const COLOR_SCHEMES = {
+                blue: "#4361ee",
+                green: "#2F9E44",
+                purple: "#7209b7",
+                dark: "#1e293b",
+
+                // 🎨 Add more custom palettes here:
+                orange: "#f77f00",
+                pink: "#d6336c",
+                teal: "#0ca678",
+                yellow: "#f59f00"
+            };
+            // 🔥 NEW: LATEST ACTION WINS (primary or scheme)
+            let primary;
+
+            // What was the last modified field?
+            if (w.__lastChanged === "primary") {
+                // User manually changed primary color last
+                primary = w.primary_color || "#4361ee";
+            } else if (w.__lastChanged === "scheme") {
+                // User picked a color scheme last
+                primary = COLOR_SCHEMES[w.color_scheme] || "#4361ee";
+            } else {
+                // Default behavior on first load
+                primary = w.primary_color || COLOR_SCHEMES[w.color_scheme] || "#4361ee";
+            }
+
+            const radius = (w.style?.corner_radius || 10);
+            const shadow = (w.style?.shadow ? "0 4px 12px rgba(0,0,0,0.12)" : "none");
+            const navigation = w.navigation || w.nav || [];
+            let pages = w.pages || w.pageMap || {};
+
+            // If pages is array -> convert to object keyed by id/title
+            if (Array.isArray(pages)) {
+                const obj = {};
+                pages.forEach(p => {
+                    const key = (p.id || p.key || (p.title && p.title.toLowerCase().replace(/\s+/g, '-')) || `page-${Math.random().toString(36).slice(2, 7)}`);
+                    obj[key] = { title: p.title || p.label || key, components: p.components || p.widgets || [] };
+                });
+                pages = obj;
+            }
+
+            // If pages is empty object, provide a safe default
+            if (!pages || (typeof pages === 'object' && Object.keys(pages).length === 0)) {
+                pages = {
+                    dashboard: {
+                        title: "Dashboard",
+                        components: [
+                            { type: "card", title: "Total Students", value: "250" },
+                            { type: "card", title: "Today Present", value: "230" },
+                            { type: "chart", title: "Attendance Trend" }
+                        ]
+                    }
+                };
+            }
+
+            // Ensure each page has components array
+            Object.keys(pages).forEach(k => {
+                const p = pages[k];
+                if (!Array.isArray(p.components)) {
+                    // if components is list of strings convert to {type:'card', title:...}
+                    if (Array.isArray(p) || Array.isArray(p.components)) {
+                        p.components = p.components || [];
+                    } else if (typeof p.components === 'string') {
+                        p.components = [{ type: 'card', title: p.components }];
+                    } else {
+                        p.components = p.components || [];
+                    }
+                }
+            });
+
+            // ---- SIDEBAR LAYOUT ----
+            if (layout === "sidebar") {
+                preview.innerHTML = `
+            <div style="display:flex;min-height:420px;border-radius:${radius}px;overflow:hidden;
+                border:1px solid #ddd;box-shadow:${shadow};">
+
+                <aside style="width:240px;background:${primary};color:white;padding:20px;">
+                    <h3 style="margin-bottom:20px;">${w.app_name || w.appName || w.title || 'App'}</h3>
+                    ${(navigation || []).map(n => `
+                        <div style="padding:10px 0;font-size:16px;">
+                            ${n.icon ? n.icon : '📌'} ${n.label || n.title || n.name || ''}
+                        </div>
+                    `).join("")}
+                </aside>
+
+                <main style="flex:1;background:#fafafa;padding:20px;">
+                    ${Object.keys(pages).map(pid => {
+                    const page = pages[pid];
+                    return `
+                            <h2 style="margin-bottom:15px;color:${primary};">${page.title}</h2>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
+                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
+                            </div>
+                        `;
+                }).join("")}
+                </main>
+            </div>
+        `;
+                return;
+            }
+
+            // ---- TOP NAV LAYOUT ----
+            if (layout === "topnav" || layout === "dashboard") {
+                preview.innerHTML = `
+            <div style="border:1px solid #ddd;border-radius:${radius}px;box-shadow:${shadow};overflow:hidden;">
+                <header style="background:${primary};color:white;padding:15px 20px;">
+                    <h2 style="margin:0;">${w.app_name || 'App'}</h2>
+                </header>
+
+                <nav style="display:flex;gap:20px;background:#f1f3f5;padding:12px 20px;border-bottom:1px solid #ddd;">
+                    ${(navigation || []).map(n => `<div style="font-weight:600;">${n.label || n.title || ''}</div>`).join("")}
+                </nav>
+
+                <div style="padding:20px;">
+                    ${Object.keys(pages).map(pid => {
+                    const page = pages[pid];
+                    return `
+                            <h2 style="color:${primary};">${page.title}</h2>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:15px;">
+                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
+                            </div>
+                        `;
+                }).join("")}
+                </div>
+            </div>
+        `;
+                return;
+            }
+
+            // ---- MOBILE LAYOUT: render ONLY if layout_type === 'mobile' ----
+            if (layout === "mobile") {
+                preview.innerHTML = `
+            <div style="width:360px;margin:auto;border-radius:${radius}px;
+                border:1px solid #aaa;overflow:hidden;box-shadow:${shadow};">
+
+                <header style="background:${primary};color:white;padding:12px;text-align:center;">
+                    <h3 style="margin:0;">${w.app_name || 'App'}</h3>
+                </header>
+
+                <div style="padding:15px;background:white;">
+                    ${Object.keys(pages).map(pid => {
+                    const page = pages[pid];
+                    return `
+                            <h4 style="margin-bottom:10px;color:${primary};">${page.title}</h4>
+                            ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow, true)).join("")}
+                        `;
+                }).join("")}
+                </div>
+            </div>
+        `;
+                return;
+            }
+
+            // default fallback if an unknown layout came through
+            preview.innerHTML = `<div style="padding:20px;">Unsupported layout: ${layout}. Showing default preview.</div>`;
+        }
+
+        function goToStep4() {
+            goToStep(4);
+
+            // Simulate API generation
+            simulateAPIGeneration();
+        }
+
+        function goToStep5() {
+            goToStep(5);
+
+            // Display APIs for confirmation
+            displayAPIsForConfirmation();
+        }
+
+        function goToStep6() {
+            goToStep(6);
+
+            // Simulate code generation
+            simulateCodeGeneration();
+        }
+
+        function goToStep7() {
+            goToStep(7);
+        }
+
+
+
+        // Initialize wireframe
+        function initializeWireframe() {
+            // Set initial values based on synopsis
+            const synopsis = document.getElementById('synopsis').value.toLowerCase();
+
+            // Set app name based on synopsis
+            if (synopsis.includes('ecommerce') || synopsis.includes('shop')) {
+                document.getElementById('app-name').value = 'My Store';
+            } else if (synopsis.includes('blog') || synopsis.includes('content')) {
+                document.getElementById('app-name').value = 'My Blog';
+            } else if (synopsis.includes('social') || synopsis.includes('network')) {
+                document.getElementById('app-name').value = 'Social Network';
+            }
+
+            // Update wireframe with initial values
+            updateWireframe();
+        }
+
+        async function updateWireframe() {
+            const layoutType = document.getElementById("layout-type").value;
+            const colorScheme = document.getElementById("color-scheme").value;
+            const primaryColor = document.getElementById("primary-color").value;
+            const appName = document.getElementById("app-name").value;
+
+            document.getElementById("updateLoader").style.display = "block";
+
+            // Updated wireframe (style-only)
+            const updatedWireframe = {
+                ...lastWireframe,
+                layout_type: layoutType,
+                color_scheme: colorScheme,
+                primary_color: primaryColor,
+                app_name: appName
+            };
+
+            // Save to backend
+            const fd = new FormData();
+            fd.append("project_id", currentProjectId);
+            fd.append("wireframe", JSON.stringify(updatedWireframe));
+
+            await fetch(`${BACKEND_URL}/api/update-wireframe`, {
+                method: "POST",
+                body: fd
+            });
+
+            // Update preview
+            lastWireframe = updatedWireframe;
+            renderAIWireframePreview(lastWireframe);
+
+            document.getElementById("updateLoader").style.display = "none";
+        }
+
+        // Handle "Add New" button click dynamically
+        document.addEventListener("click", async (e) => {
+            if (e.target && e.target.textContent.trim() === "Add New") {
+                const newName = prompt("Enter the name of the new section/component:");
+                if (!newName) return;
+
+                // 1️⃣ Add it visually in preview
+                const container = document.querySelector(".wireframe-box main, .wireframe-box div[style*='grid']");
+                if (container) {
+                    const newEl = document.createElement("div");
+                    newEl.style.background = "#e9ecef";
+                    newEl.style.padding = "20px";
+                    newEl.style.borderRadius = "8px";
+                    newEl.style.margin = "8px";
+                    newEl.textContent = newName;
+                    container.appendChild(newEl);
+                }
+
+                // 2️⃣ Get current project ID (set during upload)
+                let projectId = window.lastProjectId || localStorage.getItem("latest_project_id");
+                if (!projectId) {
+                    alert("Project ID missing. Please upload synopsis again.");
+                    return;
+                }
+
+                const wireframe = {
+                    title: document.getElementById("app-name").value,
+                    layout_type: document.getElementById("layout-type").value,
+
+                    navigation: lastWireframe.navigation,
+
+                    pages: window.currentWireframe?.pages || [],
+
+                    style: {
+                        primary_color: document.getElementById("primary-color").value,
+                        color_scheme: document.getElementById("color-scheme").value,
+                        customizable: true
+                    }
+                };
+
+                // 4️⃣ Send to backend to update MongoDB
+                const formData = new FormData();
+                formData.append("project_id", projectId);
+                formData.append("wireframe", JSON.stringify(wireframe));
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/update-wireframe`, {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        alert(`✅ "${newName}" added and saved to MongoDB.`);
+                    } else {
+                        alert("⚠️ Could not update database. Check backend logs.");
+                    }
+                } catch (err) {
+                    console.error("Error saving wireframe:", err);
+                    alert("🚫 Network or backend error occurred.");
+                }
+            }
+        });
+
+        // File upload handler
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('synopsis').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Simulate API generation
+        function simulateAPIGeneration() {
+            const synopsis = document.getElementById('synopsis').value;
+            const selectedTech = document.querySelector('.tech-option.selected').dataset.tech;
+
+            // Reset progress
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Analyzing requirements...';
+
+            // Show API list after a delay
+            setTimeout(() => {
+                progressFill.style.width = '25%';
+                progressText.textContent = 'Identifying entities...';
+            }, 800);
+
+            setTimeout(() => {
+                progressFill.style.width = '50%';
+                progressText.textContent = 'Designing database schema...';
+            }, 1600);
+
+            setTimeout(() => {
+                progressFill.style.width = '75%';
+                progressText.textContent = 'Generating API endpoints...';
+            }, 2400);
+
+            setTimeout(() => {
+                progressFill.style.width = '100%';
+                progressText.textContent = 'API generation complete!';
+
+                // Display generated APIs
+                displayGeneratedAPIs(synopsis, selectedTech);
+
+                // Show next button
+                document.getElementById('next-to-step-5').style.display = 'block';
+            }, 3200);
+        }
+
+        // Display generated APIs
+        function displayGeneratedAPIs(synopsis, tech) {
+            apiList.style.display = 'block';
+            apiList.innerHTML = '';
+
+            // Generate APIs based on synopsis and tech
+            const apis = generateAPIs(synopsis, tech);
+
+            apis.forEach(api => {
+                const apiItem = document.createElement('div');
+                apiItem.className = 'api-item';
+                apiItem.innerHTML = `
+                    <div class="api-header">
+                        <span class="api-method method-${api.method}">${api.method.toUpperCase()}</span>
+                        <span class="api-path">${api.path}</span>
+                    </div>
+                    <div class="api-description">${api.description}</div>
+                `;
+                apiList.appendChild(apiItem);
+            });
+        }
+
+        // Display APIs for confirmation
+        function displayAPIsForConfirmation() {
+            apiConfirmList.innerHTML = '';
+
+            // Clone APIs from generation step
+            const apiItems = apiList.querySelectorAll('.api-item');
+            apiItems.forEach(item => {
+                const clone = item.cloneNode(true);
+
+                // Add edit capability
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn btn-outline';
+                editBtn.style.marginTop = '0.5rem';
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', () => {
+                    // In a real app, this would open an edit modal
+                    alert('Edit functionality would open here');
+                });
+
+                clone.appendChild(editBtn);
+                apiConfirmList.appendChild(clone);
+            });
+        }
+
+        // Add new API
+        function addNewAPI() {
+            const newApiItem = document.createElement('div');
+            newApiItem.className = 'api-item';
+            newApiItem.innerHTML = `
+                <div class="api-header">
+                    <select class="api-method">
+                        <option value="get">GET</option>
+                        <option value="post">POST</option>
+                        <option value="put">PUT</option>
+                        <option value="delete">DELETE</option>
+                    </select>
+                    <input type="text" class="api-path" placeholder="/api/endpoint" style="border: 1px solid #ccc; padding: 0.25rem; border-radius: 4px;">
+                </div>
+                <input type="text" class="api-description" placeholder="API description" style="width: 100%; border: 1px solid #ccc; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem;">
+                <button class="btn btn-success" style="margin-top: 0.5rem;">Save</button>
+            `;
+
+            apiConfirmList.appendChild(newApiItem);
+        }
+
+        // Simulate code generation
+        function simulateCodeGeneration() {
+            // Reset progress
+            codeProgressFill.style.width = '0%';
+            codeProgressText.textContent = 'Setting up project structure...';
+
+            setTimeout(() => {
+                codeProgressFill.style.width = '20%';
+                codeProgressText.textContent = 'Creating backend files...';
+            }, 800);
+
+            setTimeout(() => {
+                codeProgressFill.style.width = '40%';
+                codeProgressText.textContent = 'Generating API routes...';
+            }, 1600);
+
+            setTimeout(() => {
+                codeProgressFill.style.width = '60%';
+                codeProgressText.textContent = 'Creating database models...';
+            }, 2400);
+
+            setTimeout(() => {
+                codeProgressFill.style.width = '80%';
+                codeProgressText.textContent = 'Building frontend components...';
+            }, 3200);
+
+            setTimeout(() => {
+                codeProgressFill.style.width = '100%';
+                codeProgressText.textContent = 'Code generation complete!';
+
+                // Display file tree and code preview
+                displayFileTree();
+                displayCodePreview();
+
+                // Show next button
+                document.getElementById('next-to-step-7').style.display = 'block';
+            }, 4000);
+        }
+
+        // Display file tree
+        function displayFileTree() {
+            fileTree.style.display = 'block';
+            fileTreeList.innerHTML = '';
+
+            const selectedTech = document.querySelector('.tech-option.selected').dataset.tech;
+            let files = [];
+
+            // Generate file structure based on selected technology
+            switch (selectedTech) {
+                case 'mern':
+                    files = [
+                        {
+                            name: 'backend', type: 'folder', children: [
+                                {
+                                    name: 'models', type: 'folder', children: [
+                                        { name: 'User.js', type: 'file' },
+                                        { name: 'Product.js', type: 'file' }
+                                    ]
+                                },
+                                {
+                                    name: 'routes', type: 'folder', children: [
+                                        { name: 'auth.js', type: 'file' },
+                                        { name: 'products.js', type: 'file' }
+                                    ]
+                                },
+                                { name: 'server.js', type: 'file' },
+                                { name: 'package.json', type: 'file' }
+                            ]
+                        },
+                        {
+                            name: 'frontend', type: 'folder', children: [
+                                {
+                                    name: 'src', type: 'folder', children: [
+                                        {
+                                            name: 'components', type: 'folder', children: [
+                                                { name: 'Header.js', type: 'file' },
+                                                { name: 'ProductList.js', type: 'file' }
+                                            ]
+                                        },
+                                        { name: 'App.js', type: 'file' },
+                                        { name: 'index.js', type: 'file' }
+                                    ]
+                                },
+                                { name: 'package.json', type: 'file' }
+                            ]
+                        },
+                        { name: 'README.md', type: 'file' }
+                    ];
+                    break;
+                case 'nextjs':
+                    files = [
+                        {
+                            name: 'pages', type: 'folder', children: [
+                                {
+                                    name: 'api', type: 'folder', children: [
+                                        {
+                                            name: 'auth', type: 'folder', children: [
+                                                { name: '[...nextauth].js', type: 'file' }
+                                            ]
+                                        },
+                                        { name: 'products.js', type: 'file' }
+                                    ]
+                                },
+                                { name: 'index.js', type: 'file' },
+                                { name: 'products.js', type: 'file' }
+                            ]
+                        },
+                        {
+                            name: 'components', type: 'folder', children: [
+                                { name: 'Header.js', type: 'file' },
+                                { name: 'ProductList.js', type: 'file' }
+                            ]
+                        },
+                        {
+                            name: 'styles', type: 'folder', children: [
+                                { name: 'globals.css', type: 'file' }
+                            ]
+                        },
+                        { name: 'package.json', type: 'file' },
+                        { name: 'next.config.js', type: 'file' }
+                    ];
+                    break;
+                case 'python-django':
+                    files = [
+                        {
+                            name: 'myproject', type: 'folder', children: [
+                                { name: 'settings.py', type: 'file' },
+                                { name: 'urls.py', type: 'file' },
+                                { name: 'wsgi.py', type: 'file' }
+                            ]
+                        },
+                        {
+                            name: 'myapp', type: 'folder', children: [
+                                {
+                                    name: 'migrations', type: 'folder', children: [
+                                        { name: '__init__.py', type: 'file' }
+                                    ]
+                                },
+                                { name: 'models.py', type: 'file' },
+                                { name: 'views.py', type: 'file' },
+                                { name: 'urls.py', type: 'file' }
+                            ]
+                        },
+                        { name: 'manage.py', type: 'file' },
+                        { name: 'requirements.txt', type: 'file' }
+                    ];
+                    break;
+                case 'php':
+                    files = [
+                        {
+                            name: 'includes', type: 'folder', children: [
+                                { name: 'config.php', type: 'file' },
+                                { name: 'database.php', type: 'file' }
+                            ]
+                        },
+                        {
+                            name: 'models', type: 'folder', children: [
+                                { name: 'User.php', type: 'file' },
+                                { name: 'Product.php', type: 'file' }
+                            ]
+                        },
+                        {
+                            name: 'api', type: 'folder', children: [
+                                { name: 'auth.php', type: 'file' },
+                                { name: 'products.php', type: 'file' }
+                            ]
+                        },
+                        { name: 'index.php', type: 'file' },
+                        { name: 'composer.json', type: 'file' }
+                    ];
+                    break;
+                case 'flutter':
+                    files = [
+                        {
+                            name: 'lib', type: 'folder', children: [
+                                {
+                                    name: 'models', type: 'folder', children: [
+                                        { name: 'user.dart', type: 'file' },
+                                        { name: 'product.dart', type: 'file' }
+                                    ]
+                                },
+                                {
+                                    name: 'screens', type: 'folder', children: [
+                                        { name: 'home_screen.dart', type: 'file' },
+                                        { name: 'product_screen.dart', type: 'file' }
+                                    ]
+                                },
+                                {
+                                    name: 'services', type: 'folder', children: [
+                                        { name: 'api_service.dart', type: 'file' }
+                                    ]
+                                },
+                                { name: 'main.dart', type: 'file' }
+                            ]
+                        },
+                        { name: 'pubspec.yaml', type: 'file' }
+                    ];
+                    break;
+                case 'react-native':
+                    files = [
+                        {
+                            name: 'src', type: 'folder', children: [
+                                {
+                                    name: 'components', type: 'folder', children: [
+                                        { name: 'Header.js', type: 'file' },
+                                        { name: 'ProductList.js', type: 'file' }
+                                    ]
+                                },
+                                {
+                                    name: 'screens', type: 'folder', children: [
+                                        { name: 'HomeScreen.js', type: 'file' },
+                                        { name: 'ProductScreen.js', type: 'file' }
+                                    ]
+                                },
+                                {
+                                    name: 'services', type: 'folder', children: [
+                                        { name: 'api.js', type: 'file' }
+                                    ]
+                                },
+                                { name: 'App.js', type: 'file' }
+                            ]
+                        },
+                        { name: 'package.json', type: 'file' }
+                    ];
+                    break;
+            }
+
+            function renderFiles(files, parentEl) {
+                files.forEach(file => {
+                    const li = document.createElement('li');
+
+                    if (file.type === 'folder') {
+                        li.innerHTML = `<i class="fas fa-folder"></i> ${file.name}`;
+                        const ul = document.createElement('ul');
+                        li.appendChild(ul);
+                        renderFiles(file.children, ul);
+                    } else {
+                        li.innerHTML = `<i class="fas fa-file-code"></i> ${file.name}`;
+                        li.addEventListener('click', () => {
+                            // Show file content in preview
+                            showFilePreview(file.name, selectedTech);
+                        });
+                    }
+
+                    parentEl.appendChild(li);
+                });
+            }
+
+            renderFiles(files, fileTreeList);
+        }
+
+        // Display code preview
+        function displayCodePreview() {
+            codePreview.style.display = 'block';
+            const selectedTech = document.querySelector('.tech-option.selected').dataset.tech;
+            showFilePreview(getMainFileName(selectedTech), selectedTech);
+        }
+
+        // Get main file name based on technology
+        function getMainFileName(tech) {
+            switch (tech) {
+                case 'mern': return 'server.js';
+                case 'nextjs': return 'pages/index.js';
+                case 'python-django': return 'manage.py';
+                case 'php': return 'index.php';
+                case 'flutter': return 'lib/main.dart';
+                case 'react-native': return 'App.js';
+                default: return 'server.js';
+            }
+        }
+
+        // Show file content in preview
+        function showFilePreview(filename, tech) {
+            // In a real app, this would fetch the actual file content
+            // For demo, we'll use sample content based on filename and tech
+            let content = '';
+
+            switch (tech) {
+                case 'mern':
+                    if (filename === 'server.js') {
+                        content = `const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/myapp', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/products', require('./routes/products'));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(\`Server running on port \${PORT}\`);
+});`;
+                    }
+                    break;
+                case 'nextjs':
+                    if (filename === 'pages/index.js') {
+                        content = `import Head from 'next/head'
+import { useState, useEffect } from 'react'
+
+export default function Home() {
+  const [products, setProducts] = useState([])
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async () => {
+    const res = await fetch('/api/products')
+    const data = await res.json()
+    setProducts(data)
+  }
+
+  return (
+    <div>
+      <Head>
+        <title>My Next.js App</title>
+        <meta name="description" content="Generated by SynopsisAI" />
+      </Head>
+
+      <main>
+        <h1>Welcome to My Next.js App</h1>
+        <div>
+          {products.map(product => (
+            <div key={product.id}>
+              <h3>{product.name}</h3>
+              <p>{product.description}</p>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  )
+}`;
+                    }
+                    break;
+                case 'python-django':
+                    if (filename === 'manage.py') {
+                        content = `#!/usr/bin/env python
+import os
+import sys
+
+if __name__ == '__main__':
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed?"
+        ) from exc
+    execute_from_command_line(sys.argv)`;
+                    }
+                    break;
+                case 'php':
+                    if (filename === 'index.php') {
+                        content = `<?php
+require_once 'includes/config.php';
+require_once 'includes/database.php';
+
+header('Content-Type: application/json');
+
+// Simple router
+$request = $_SERVER['REQUEST_URI'];
+$method = $_SERVER['REQUEST_METHOD'];
+
+switch ($request) {
+    case '/api/products':
+        if ($method == 'GET') {
+            // Get products from database
+            $products = getProducts();
+            echo json_encode($products);
+        }
+        break;
+    default:
+        http_response_code(404);
+        echo json_encode(['error' => 'Endpoint not found']);
+        break;
+}
+
+function getProducts() {
+    // This would query the database in a real app
+    return [
+        ['id' => 1, 'name' => 'Product 1', 'price' => 19.99],
+        ['id' => 2, 'name' => 'Product 2', 'price' => 29.99]
+    ];
+}
+?>`;
+                    }
+                    break;
+                case 'flutter':
+                    if (filename === 'lib/main.dart') {
+                        content = `import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'My Flutter App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: HomeScreen(),
+    );
+  }
+}`;
+                    }
+                    break;
+                case 'react-native':
+                    if (filename === 'App.js') {
+                        content = `import React from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import HomeScreen from './src/screens/HomeScreen';
+
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <HomeScreen />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});`;
+                    }
+                    break;
+                default:
+                    content = `// Content for ${filename} would be generated here`;
+            }
+
+            previewCode.textContent = content;
+            codePreview.querySelector('.output-header div').textContent = filename;
+        }
+
+        // Generate APIs based on synopsis
+        function generateAPIs(synopsis, tech) {
+            // This is a simplified example - in a real app, this would use AI
+            const apis = [];
+
+            // Common APIs for most applications
+            apis.push({
+                method: 'post',
+                path: '/api/auth/register',
+                description: 'Register a new user'
+            });
+
+            apis.push({
+                method: 'post',
+                path: '/api/auth/login',
+                description: 'Login user'
+            });
+
+            // Add APIs based on keywords in synopsis
+            if (synopsis.toLowerCase().includes('product') || synopsis.toLowerCase().includes('item')) {
+                apis.push({
+                    method: 'get',
+                    path: '/api/products',
+                    description: 'Get all products'
+                });
+
+                apis.push({
+                    method: 'get',
+                    path: '/api/products/:id',
+                    description: 'Get a single product'
+                });
+
+                apis.push({
+                    method: 'post',
+                    path: '/api/products',
+                    description: 'Create a new product'
+                });
+
+                apis.push({
+                    method: 'put',
+                    path: '/api/products/:id',
+                    description: 'Update a product'
+                });
+
+                apis.push({
+                    method: 'delete',
+                    path: '/api/products/:id',
+                    description: 'Delete a product'
+                });
+            }
+
+            if (synopsis.toLowerCase().includes('user') || synopsis.toLowerCase().includes('profile')) {
+                apis.push({
+                    method: 'get',
+                    path: '/api/users/profile',
+                    description: 'Get user profile'
+                });
+
+                apis.push({
+                    method: 'put',
+                    path: '/api/users/profile',
+                    description: 'Update user profile'
+                });
+            }
+
+            if (synopsis.toLowerCase().includes('order') || synopsis.toLowerCase().includes('purchase')) {
+                apis.push({
+                    method: 'get',
+                    path: '/api/orders',
+                    description: 'Get user orders'
+                });
+
+                apis.push({
+                    method: 'post',
+                    path: '/api/orders',
+                    description: 'Create a new order'
+                });
+            }
+
+            return apis;
+        }
+
+        // Download code
+        function downloadCode() {
+            const projectName = document.getElementById('project-name').value || 'my-project';
+            const selectedFormat = document.querySelector('.download-option.selected').dataset.format;
+
+            alert(`Downloading your ${projectName} code as ${selectedFormat.toUpperCase()}!`);
+
+            // In a real app, this would trigger an actual download
+            // For demo, we'll just show a success message
+            downloadBtn.innerHTML = '<i class="fas fa-check"></i> Download Complete!';
+            downloadBtn.disabled = true;
+
+            setTimeout(() => {
+                downloadBtn.innerHTML = 'Download Code';
+                downloadBtn.disabled = false;
+            }, 3000);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+    <!-- Global Loading Overlay -->
+    <div id="global-loader">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <p>Please wait... Processing your synopsis with AI</p>
+        </div>
+    </div>
+
+    <style>
+        #global-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+        }
+
+        .loader-box {
+            text-align: center;
+        }
+
+        .spinner {
+            border: 6px solid #eee;
+            border-top: 6px solid #6a0dad;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: auto;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</body>
+
+</html>
