@@ -1157,6 +1157,7 @@
 
     <script>
         const BACKEND_URL = "http://127.0.0.1:8000";
+        let selectedWireframePage = null;
         function normalizeNavText(str) {
             return str
                 .split(",")
@@ -1852,6 +1853,21 @@
                 }
             });
 
+            // clickable sidebar
+            document.querySelectorAll(".nav-item").forEach(item => {
+                item.addEventListener("click", () => {
+                    selectedWireframePage = item.dataset.page;
+
+                    // highlight active
+                    document.querySelectorAll(".nav-item").forEach(i =>
+                        i.classList.remove("active")
+                    );
+                    item.classList.add("active");
+
+                    renderAIWireframePreview(w);
+                });
+            });
+
             // ---- SIDEBAR LAYOUT ----
             if (layout === "sidebar") {
                 preview.innerHTML = `
@@ -1861,22 +1877,32 @@
                 <aside style="width:240px;background:${primary};color:white;padding:20px;">
                     <h3 style="margin-bottom:20px;">${w.app_name || w.appName || w.title || 'App'}</h3>
                     ${(navigation || []).map(n => `
-                        <div style="padding:10px 0;font-size:16px;">
-                            ${n.icon ? n.icon : '📌'} ${n.label || n.title || n.name || ''}
-                        </div>
-                    `).join("")}
+    <div class="nav-item" data-page="${n.id || n.label.toLowerCase().replace(/\s+/g, '')}"
+         style="padding:10px 0;font-size:16px;cursor:pointer;">
+        ${n.icon ? n.icon : '📌'} ${n.label}
+    </div>
+`).join("")}
                 </aside>
 
                 <main style="flex:1;background:#fafafa;padding:20px;">
-                    ${Object.keys(pages).map(pid => {
-                    const page = pages[pid];
-                    return `
-                            <h2 style="margin-bottom:15px;color:${primary};">${page.title}</h2>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
-                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
-                            </div>
-                        `;
-                }).join("")}
+                    ${(() => {
+                        const pid = selectedWireframePage || Object.keys(pages)[0];
+                        const page = pages[pid];
+
+                        if (!page) return "<p>No page found</p>";
+
+                        return `
+        <h2 style="margin-bottom:15px;color:${primary};">${page.title}</h2>
+
+        <div style="display:grid;
+                    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+                    gap:12px;">
+            ${(page.components || []).map(c =>
+                            renderComponent(c, primary, radius, shadow)
+                        ).join("")}
+        </div>
+    `;
+                    })()}
                 </main>
             </div>
         `;
@@ -1885,29 +1911,44 @@
 
             // ---- TOP NAV LAYOUT ----
             if (layout === "topnav" || layout === "dashboard") {
+
                 preview.innerHTML = `
-            <div style="border:1px solid #ddd;border-radius:${radius}px;box-shadow:${shadow};overflow:hidden;">
-                <header style="background:${primary};color:white;padding:15px 20px;">
-                    <h2 style="margin:0;">${w.app_name || 'App'}</h2>
-                </header>
+        <div style="border:1px solid #ddd;border-radius:${radius}px;box-shadow:${shadow};overflow:hidden;">
 
-                <nav style="display:flex;gap:20px;background:#f1f3f5;padding:12px 20px;border-bottom:1px solid #ddd;">
-                    ${(navigation || []).map(n => `<div style="font-weight:600;">${n.label || n.title || ''}</div>`).join("")}
-                </nav>
+            <header style="background:${primary};color:white;padding:15px 20px;">
+                <h2 style="margin:0;">${w.app_name || 'App'}</h2>
+            </header>
 
-                <div style="padding:20px;">
-                    ${Object.keys(pages).map(pid => {
-                    const page = pages[pid];
-                    return `
-                            <h2 style="color:${primary};">${page.title}</h2>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:15px;">
-                                ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow)).join("")}
-                            </div>
-                        `;
-                }).join("")}
-                </div>
+            <nav style="display:flex;gap:20px;background:#f1f3f5;padding:12px 20px;border-bottom:1px solid #ddd;">
+                ${(navigation || []).map(n => `
+                    <div class="nav-item"
+                         data-page="${n.id || n.label.toLowerCase().replace(/\\s+/g, '')}"
+                         style="cursor:pointer;font-weight:600;">
+                         ${n.label}
+                    </div>
+                `).join("")}
+            </nav>
+
+            <div style="padding:20px;">
+                ${(() => {
+                        const pid = selectedWireframePage || Object.keys(pages)[0];
+                        const page = pages[pid];
+                        if (!page) return "<p>No page found</p>";
+
+                        return `
+                        <h2 style="color:${primary};">${page.title}</h2>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:15px;">
+                            ${(page.components || []).map(c =>
+                            renderComponent(c, primary, radius, shadow)
+                        ).join("")}
+                        </div>
+                    `;
+                    })()}
             </div>
-        `;
+
+        </div>
+    `;
+
                 return;
             }
 
@@ -2777,6 +2818,12 @@ const styles = StyleSheet.create({
             justify-content: center;
             align-items: center;
             z-index: 5000;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-weight: bold;
         }
 
         .loader-box {
