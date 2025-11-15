@@ -933,6 +933,11 @@ Teacher Module:
                                             <option value="green">Green</option>
                                             <option value="purple">Purple</option>
                                             <option value="dark">Dark</option>
+                                            <!-- Add these -->
+                                            <option value="orange">Orange</option>
+                                            <option value="yellow">Yellow</option>
+                                            <option value="pink">Pink</option>
+                                            <option value="teal">Teal</option>
                                         </select>
                                     </div>
 
@@ -946,10 +951,7 @@ Teacher Module:
                                         <input type="text" id="app-name" value="My Application">
                                     </div>
 
-                                    <div class="edit-control">
-                                        <label for="nav-items">Navigation Items (comma separated)</label>
-                                        <input type="text" id="nav-items" value="Dashboard, Users, Products, Settings">
-                                    </div>
+
                                 </div>
 
                                 <button class="btn btn-primary" id="update-wireframe-btn">
@@ -1158,6 +1160,13 @@ Teacher Module:
 
     <script>
         const BACKEND_URL = "http://127.0.0.1:8000";
+        function normalizeNavText(str) {
+            return str
+                .split(",")
+                .map(s => s.trim().toLowerCase().replace(/\s+/g, ""))
+                .filter(s => s.length)
+                .join(",");
+        }
         // DOM Elements
         const stepContents = document.querySelectorAll('.step-content');
         const steps = document.querySelectorAll('.step');
@@ -1485,7 +1494,9 @@ Teacher Module:
                     .map(n => (n.label || n.name || "").toLowerCase().replace(/\s+/g, ""))
                     .join(",");
                 lastWireframe = { ...w };
-                lastWireframe.navigation_text = navKeyInit;
+                lastWireframe.navigation_text = normalizeNavText(
+                    (w.navigation || []).map(n => n.label || n.name).join(",")
+                );
 
 
                 // Now normalize values SAFELY (after w exists)
@@ -1505,12 +1516,27 @@ Teacher Module:
 
 
 
-                // Fill right panel fields using normalized values
-                document.getElementById("app-name").value = w.app_name || w.appName || w.title || "My Application";
-                document.getElementById("layout-type").value = layoutType;
-                document.getElementById("primary-color").value = primaryColor;
-                document.getElementById("color-scheme").value = colorScheme;
-                document.getElementById("nav-items").value = (nav || []).map(n => n.label || n.name || n).join(", ");
+                document.getElementById("app-name").value =
+                    lastWireframe.app_name || "My Application";
+
+                document.getElementById("layout-type").value =
+                    lastWireframe.layout_type || "sidebar";
+
+                document.getElementById("primary-color").value =
+                    lastWireframe.primary_color || "#4361ee";
+
+                document.getElementById("color-scheme").value =
+                    lastWireframe.color_scheme || "blue";
+
+                const safeSet = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = value;
+                };
+
+                safeSet("app-name", lastWireframe.app_name || "My Application");
+                safeSet("layout-type", lastWireframe.layout_type || "sidebar");
+                safeSet("primary-color", lastWireframe.primary_color || "#4361ee");
+                safeSet("color-scheme", lastWireframe.color_scheme || "blue");
 
                 // Render Preview (uses the robust renderer below)
                 renderAIWireframePreview(w);
@@ -1600,7 +1626,35 @@ Teacher Module:
 
             // Robust normalization for layout, colors, nav and pages
             const layout = (w.layout_type || w.layout?.type || w.ui_layout || w.layoutType || 'sidebar').toString().toLowerCase();
-            const primary = w.primary_color || w.primaryColor || w.layout?.primary_color || '#4361ee';
+            // Determine final primary color
+            // Add this inside renderAIWireframePreview, at the top
+            const COLOR_SCHEMES = {
+                blue: "#4361ee",
+                green: "#2F9E44",
+                purple: "#7209b7",
+                dark: "#1e293b",
+
+                // 🎨 Add more custom palettes here:
+                orange: "#f77f00",
+                pink: "#d6336c",
+                teal: "#0ca678",
+                yellow: "#f59f00"
+            };
+            // 🔥 NEW: LATEST ACTION WINS (primary or scheme)
+            let primary;
+
+            // What was the last modified field?
+            if (w.__lastChanged === "primary") {
+                // User manually changed primary color last
+                primary = w.primary_color || "#4361ee";
+            } else if (w.__lastChanged === "scheme") {
+                // User picked a color scheme last
+                primary = COLOR_SCHEMES[w.color_scheme] || "#4361ee";
+            } else {
+                // Default behavior on first load
+                primary = w.primary_color || COLOR_SCHEMES[w.color_scheme] || "#4361ee";
+            }
+
             const radius = (w.style?.corner_radius || 10);
             const shadow = (w.style?.shadow ? "0 4px 12px rgba(0,0,0,0.12)" : "none");
             const navigation = w.navigation || w.nav || [];
@@ -1783,79 +1837,18 @@ Teacher Module:
             const primaryColor = document.getElementById("primary-color").value;
             const appName = document.getElementById("app-name").value;
 
-            // Convert navigation text → normalized labels array
-            const navText = document.getElementById("nav-items").value;
-            const newNavList = navText
-                .split(",")
-                .map(x => x.trim().toLowerCase())
-                .filter(x => x.length > 0);
-
-            const newNavKey = newNavList.join(",");
-
-            // Read old normalized navigation string
-            const oldNavKey = lastWireframe.navigation_text || "";
-
             document.getElementById("updateLoader").style.display = "block";
 
-            // --------------------------------------------------------------------
-            // CASE 1: Navigation changed → MUST call AI
-            // --------------------------------------------------------------------
-            if (newNavKey !== oldNavKey) {
-                console.log("⚠️ Navigation changed → Calling AI...");
-
-                const fd = new FormData();
-                fd.append("project_id", currentProjectId);
-
-                const res = await fetch(`${BACKEND_URL}/api/generate-wireframe`, {
-                    method: "POST",
-                    body: fd
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    lastWireframe = { ...data.wireframe };
-                    lastWireframe.navigation_text = newNavKey;
-                    lastWireframe.navigation_text = newNavKey;
-
-                    // Update UI fields after AI generates new JSON
-                    document.getElementById("app-name").value =
-                        lastWireframe.app_name || "My Application";
-
-                    document.getElementById("layout-type").value =
-                        lastWireframe.layout_type || "sidebar";
-
-                    document.getElementById("primary-color").value =
-                        lastWireframe.primary_color || "#4361ee";
-
-                    document.getElementById("color-scheme").value =
-                        lastWireframe.color_scheme || "blue";
-
-                    document.getElementById("nav-items").value =
-                        (lastWireframe.navigation || [])
-                            .map(i => i.label)
-                            .join(", ");
-
-                    renderAIWireframePreview(lastWireframe);
-                }
-
-                document.getElementById("updateLoader").style.display = "none";
-                return;
-            }
-
-            // --------------------------------------------------------------------
-            // CASE 2: ONLY style/appName/layout changed → simple Mongo update
-            // --------------------------------------------------------------------
-            console.log("🎨 Style-only update → saving directly to Mongo (no AI)");
-
+            // Updated wireframe (style-only)
             const updatedWireframe = {
                 ...lastWireframe,
-                app_name: appName,
                 layout_type: layoutType,
+                color_scheme: colorScheme,
                 primary_color: primaryColor,
-                color_scheme: colorScheme
+                app_name: appName
             };
 
+            // Save to backend
             const fd = new FormData();
             fd.append("project_id", currentProjectId);
             fd.append("wireframe", JSON.stringify(updatedWireframe));
@@ -1865,11 +1858,8 @@ Teacher Module:
                 body: fd
             });
 
-            // Update memory
-            lastWireframe = updatedWireframe;
-            lastWireframe.navigation_text = newNavKey;
-
             // Update preview
+            lastWireframe = updatedWireframe;
             renderAIWireframePreview(lastWireframe);
 
             document.getElementById("updateLoader").style.display = "none";
@@ -1904,11 +1894,7 @@ Teacher Module:
                     title: document.getElementById("app-name").value,
                     layout_type: document.getElementById("layout-type").value,
 
-                    navigation: document.getElementById("nav-items").value.split(",").map(i => ({
-                        id: i.trim().toLowerCase().replace(/\s+/g, "-"),
-                        label: i.trim(),
-                        path: "/" + i.trim().toLowerCase().replace(/\s+/g, "-")
-                    })),
+                    navigation: lastWireframe.navigation,
 
                     pages: window.currentWireframe?.pages || [],
 

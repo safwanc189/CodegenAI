@@ -282,7 +282,7 @@ async def generate_wireframe(project_id: str = Form(...)):
         return {"success": False, "error": "Project not found"}
 
     # generate via AI
-    project["tech"] = project.get("tech") or project.get("tech_stack", [])
+    project["tech"] = project.get("tech_stack", [])
     wireframe = await generate_wireframe_ai(project)
 
     oid = ObjectId(project_id)
@@ -302,41 +302,12 @@ async def generate_wireframe(project_id: str = Form(...)):
 # 📝 API: Update Only Wireframe (Used for Step 3 UI changes)
 # =============================================================================
 @app.post("/api/update-wireframe")
-async def update_wireframe(
-    project_id: str = Form(...),
-    wireframe: str = Form(...)
-):
+async def update_wireframe(project_id: str = Form(...), wireframe: str = Form(...)):
     try:
         oid = ObjectId(project_id)
         wf = json.loads(wireframe)
 
-        # ---------------------------------------------------------
-        # 🔥 STEP 1: Fetch existing wireframe only for NAV comparison
-        # ---------------------------------------------------------
-        project = await get_project(project_id)
-        old_wf = project.get("wireframe", {})
-
-        old_nav = [str(item.get("label") if isinstance(item, dict) else item).lower().strip()
-                   for item in old_wf.get("navigation", [])]
-
-        new_nav = [str(item.get("label") if isinstance(item, dict) else item).lower().strip()
-                   for item in wf.get("navigation", [])]
-
-        # Only THIS decides AI call
-        nav_changed = old_nav != new_nav
-
-        # ---------------------------------------------------------
-        # ❌ DO NOT CALL AI for color / name / theme changes
-        # ---------------------------------------------------------
-        if nav_changed:
-            print("🔄 Navigation changed → Calling LLaMA to regenerate wireframe...")
-            from services.ai_agent import generate_wireframe_ai
-            full_project = await get_project(project_id)
-            wf = await generate_wireframe_ai(full_project)
-
-        # ---------------------------------------------------------
-        # 💾 Save final wireframe to MongoDB
-        # ---------------------------------------------------------
+        # Always just save – NEVER trigger AI
         result = await collection.update_one(
             {"_id": oid},
             {"$set": {"wireframe": wf}}
@@ -344,11 +315,9 @@ async def update_wireframe(
 
         return {
             "success": True,
-            "navigation_changed": nav_changed,
-            "message": "Wireframe updated",
-            "wireframe": wf
+            "modified": result.modified_count > 0,
+            "message": "Wireframe updated successfully"
         }
 
     except Exception as e:
-        print("❌ update-wireframe ERROR:", e)
         return {"success": False, "error": str(e)}
