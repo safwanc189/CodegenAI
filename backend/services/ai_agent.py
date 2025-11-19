@@ -211,32 +211,8 @@ def validate_and_enrich(wf: Dict[str, Any], project: Dict[str, Any]) -> Dict[str
     else:
         wf["navigation"] = nav_items_list # Update the simple list object
         
-    # FINAL STEP: Ensure the wireframe object is updated with the modified list
-    if isinstance(nav_data, dict) and 'items' in nav_data:
-        nav_data['items'] = nav_items_list
-        wf["navigation"] = nav_data # Update the full dictionary object
-    else:
-        wf["navigation"] = nav_items_list # Update the simple list object
-
     print("--- DEBUG ENRICHMENT END ---\n")
-
-    # -----------------------------------------
-    # FIX 2: Convert pages list → dict (frontend expects object)
-    # -----------------------------------------
-    pages = wf.get("pages", {})
-
-    if isinstance(pages, list):
-        pages_dict = {}
-        for page in pages:
-            name = page.get("name")
-            if not name:
-                continue
-            pid = slugify(name)
-            pages_dict[pid] = page
-        wf["pages"] = pages_dict
-
     return wf
-
 
 # -------------------------------------------------------------------
 # FALLBACK
