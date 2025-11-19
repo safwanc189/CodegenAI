@@ -273,35 +273,77 @@ async def update_project(project_id: str = Form(...), project: str = Form(...)):
     except Exception as e:
         print("❌ [Update Project ERROR]:", e)
         return {"success": False, "error": str(e)}
+
 # =============================================================================
-# 🧱 API: Generate Wireframe Layout (AI call)
+# 🧱 API: Generate FULL Wireframe (using LLAMA Big-Call)
 # =============================================================================
 @app.post("/api/generate-wireframe")
 async def generate_wireframe(project_id: str = Form(...)):
     from services.ai_agent import generate_wireframe_ai
+    from bson import ObjectId
 
-    print("\n🤖 [AI AGENT] Generating wireframe via LLaMA...")
+    print("\n🤖 [AI AGENT] Generating FULL wireframe via LLaMA...")
 
+    # ------------------------------------------------------------
+    # STEP 1: Fetch project from DB
+    # ------------------------------------------------------------
     project = await get_project(project_id)
     if not project:
         return {"success": False, "error": "Project not found"}
 
-    # generate via AI
-    project["tech"] = project.get("tech_stack", [])
-    wireframe = await generate_wireframe_ai(project)
+    print(f"📦 [DB] Retrieved project: {project.get('title')}")
 
-    oid = ObjectId(project_id)
-    result = await collection.update_one(
-        {"_id": oid},
-        {"$set": {"wireframe": wireframe}}
-    )
+    # ------------------------------------------------------------
+    # STEP 2: Ask LLaMA to generate FULL UI JSON
+    # ------------------------------------------------------------
+    try:
+        ai_wireframe = await generate_wireframe_ai(project)
+    except Exception as e:
+        print("❌ [AI ERROR]:", e)
+        return {
+            "success": False,
+            "error": "AI wireframe generation failed",
+            "detail": str(e)
+        }
 
+    # LLaMA must return dictionary
+    if not isinstance(ai_wireframe, dict):
+        print("❌ Invalid wireframe returned by LLaMA")
+        return {
+            "success": False,
+            "error": "Invalid wireframe JSON returned by AI",
+            "raw_output": str(ai_wireframe)
+        }
+
+    print("🎨 [AI] Full wireframe generated successfully")
+
+    # ------------------------------------------------------------
+    # STEP 3: Save wireframe to MongoDB
+    # ------------------------------------------------------------
+    try:
+        oid = ObjectId(project_id)
+        await collection.update_one(
+            {"_id": oid},
+            {"$set": {"wireframe": ai_wireframe}}
+        )
+        print("✅ Wireframe saved to DB")
+    except Exception as e:
+        print("❌ [DB ERROR]:", e)
+        return {
+            "success": False,
+            "error": f"Database save error: {str(e)}"
+        }
+
+    # ------------------------------------------------------------
+    # STEP 4: Send response to frontend
+    # ------------------------------------------------------------
     return {
         "success": True,
         "project_id": project_id,
         "title": project.get("title"),
-        "wireframe": wireframe
+        "wireframe": ai_wireframe
     }
+
 
 # =============================================================================
 # 📝 API: Update Only Wireframe (Used for Step 3 UI changes)

@@ -751,367 +751,383 @@
             <!-- Step 1: Upload Synopsis -->
             <div class="step-content active" id="step-1">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Upload Project Synopsis</h3>
-                    </div>
 
-                    <div class="input-group">
-                        <label for="synopsis">Project Synopsis / Description</label>
-                        <textarea id="synopsis"
-                            placeholder="Describe your project requirements in detail..."></textarea>
-                    </div>
+                </div>
 
-                    <div class="input-group">
-                        <label>Or Upload File</label>
-                        <div class="file-upload-area" id="file-upload-area">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <h3>Drag & Drop your file here</h3>
-                            <p>Supported formats: .txt, .doc, .docx, .pdf</p>
-                            <input type="file" id="file-upload" hidden>
-                        </div>
-                    </div>
+                <div class="input-group">
+                    <label for="synopsis">Project Synopsis / Description</label>
+                    <textarea id="synopsis" placeholder="Describe your project requirements in detail..."></textarea>
+                </div>
 
-                    <div class="input-group">
-                        <label>Technology Stack</label>
-                        <div class="tech-options">
-                            <div class="tech-option selected" data-tech="mern">
-                                <div class="tech-icon">⚛️</div>
-                                <div>MERN Stack</div>
-                            </div>
-                            <div class="tech-option" data-tech="nextjs">
-                                <div class="tech-icon">▲</div>
-                                <div>Next.js</div>
-                            </div>
-                            <div class="tech-option" data-tech="python-django">
-                                <div class="tech-icon">🐍</div>
-                                <div>Python Django</div>
-                            </div>
-                            <div class="tech-option" data-tech="php">
-                                <div class="tech-icon">🐘</div>
-                                <div>PHP</div>
-                            </div>
-                            <div class="tech-option" data-tech="flutter">
-                                <div class="tech-icon">💙</div>
-                                <div>Flutter</div>
-                            </div>
-                            <div class="tech-option" data-tech="react-native">
-                                <div class="tech-icon">📱</div>
-                                <div>React Native</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-primary btn-large" id="next-to-step-2">Next: Confirm Synopsis</button>
+                <div class="input-group">
+                    <label>Or Upload File</label>
+                    <div class="file-upload-area" id="file-upload-area">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Drag & Drop your file here</h3>
+                        <p>Supported formats: .txt, .doc, .docx, .pdf</p>
+                        <input type="file" id="file-upload" hidden>
                     </div>
                 </div>
-            </div>
 
-            <!-- Step 2: Confirm Synopsis -->
-            <div class="step-content" id="step-2">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Confirm Your Project Overview</h3>
+                <div class="input-group">
+                    <label>Technology Stack</label>
+                    <div class="tech-options">
+                        <div class="tech-option selected" data-tech="mern">
+                            <div class="tech-icon">⚛️</div>
+                            <div>MERN Stack</div>
+                        </div>
+                        <div class="tech-option" data-tech="nextjs">
+                            <div class="tech-icon">▲</div>
+                            <div>Next.js</div>
+                        </div>
+                        <div class="tech-option" data-tech="python-django">
+                            <div class="tech-icon">🐍</div>
+                            <div>Python Django</div>
+                        </div>
+                        <div class="tech-option" data-tech="php">
+                            <div class="tech-icon">🐘</div>
+                            <div>PHP</div>
+                        </div>
+                        <div class="tech-option" data-tech="flutter">
+                            <div class="tech-icon">💙</div>
+                            <div>Flutter</div>
+                        </div>
+                        <div class="tech-option" data-tech="react-native">
+                            <div class="tech-icon">📱</div>
+                            <div>React Native</div>
+                        </div>
                     </div>
+                </div>
 
-                    <div id="project-details" style="padding: 1rem;">
-                        <h4>📌 Project Title</h4>
-                        <p id="p-title" class="preview-field"></p>
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-large" id="next-to-step-2">Next: Confirm Synopsis</button>
+                </div>
+            </div>
+        </div>
 
-                        <h4>📝 Description</h4>
-                        <p id="p-description" class="preview-field"></p>
+        <!-- Step 2: Confirm Synopsis -->
+        <div class="step-content" id="step-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Confirm Your Project Overview</h3>
+                </div>
 
-                        <h4>✨ Features</h4>
-                        <ul id="p-features"></ul>
+                <div id="project-details" style="padding: 1rem;">
+                    <h4>📌 Project Title</h4>
+                    <p id="p-title" class="preview-field"></p>
 
-                        <h4>📦 Modules</h4>
-                        <ul id="p-modules"></ul>
+                    <h4>📝 Description</h4>
+                    <p id="p-description" class="preview-field"></p>
 
-                        <h4>💻 Tech Stack</h4>
-                        <ul id="p-tech"></ul>
+                    <h4>✨ Features</h4>
+                    <ul id="p-features"></ul>
 
-                        <h4>🎯 Target Platform</h4>
-                        <p id="p-platform" class="preview-field"></p>
+                    <h4>📦 Modules</h4>
+                    <ul id="p-modules"></ul>
 
-                        <!-- <h4>🎨 UI Preferences</h4>
+                    <h4>💻 Tech Stack</h4>
+                    <ul id="p-tech"></ul>
+
+                    <h4>🎯 Target Platform</h4>
+                    <p id="p-platform" class="preview-field"></p>
+
+                    <!-- <h4>🎨 UI Preferences</h4>
                         <p><b>Layout:</b> <span id="p-layout"></span></p>
                         <p><b>Color Scheme:</b> <span id="p-color-scheme"></span></p>
                         <p><b>Primary Color:</b> <span id="p-primary-color"></span></p> -->
 
-                        <h4>🤖 AI Summary</h4>
-                        <p id="p-summary" class="preview-field"></p>
-                    </div>
+                    <h4>🤖 AI Summary</h4>
+                    <p id="p-summary" class="preview-field"></p>
+                </div>
 
-                    <button class="btn btn-outline" id="edit-project-btn"
-                        style="margin-top: 1rem; color:#333; border-color:#333;">
-                        <i class="fas fa-edit"></i> Edit Project
+                <button class="btn btn-outline" id="edit-project-btn"
+                    style="margin-top: 1rem; color:#333; border-color:#333;">
+                    <i class="fas fa-edit"></i> Edit Project
+                </button>
+
+                <!-- ================= EDIT PROJECT FORM ================= -->
+                <div id="edit-form"
+                    style="display:none; margin-top:20px; padding:1rem; border:1px solid #ddd; border-radius:8px;">
+
+                    <h3>✏️ Edit Project</h3>
+
+                    <label>Project Title</label>
+                    <input id="edit-title" class="edit-input">
+
+                    <label>Description</label>
+                    <textarea id="edit-description" class="edit-input"></textarea>
+
+                    <label>Features (comma separated)</label>
+                    <input id="edit-features" class="edit-input">
+
+                    <label>Modules & Components</label>
+                    <div id="module-editor"></div>
+
+                    <button id="add-module-btn" class="btn btn-primary" style="margin-top:10px;">
+                        + Add Module
                     </button>
 
-                    <!-- ================= EDIT PROJECT FORM ================= -->
-                    <div id="edit-form"
-                        style="display:none; margin-top:20px; padding:1rem; border:1px solid #ddd; border-radius:8px;">
+                    <label>Tech Stack (comma separated)</label>
+                    <input id="edit-tech" class="edit-input">
 
-                        <h3>✏️ Edit Project</h3>
+                    <label>Target Platform</label>
+                    <input id="edit-platform" class="edit-input">
 
-                        <label>Project Title</label>
-                        <input id="edit-title" class="edit-input">
+                    <label>AI Summary</label>
+                    <textarea id="edit-summary" class="edit-input"></textarea>
 
-                        <label>Description</label>
-                        <textarea id="edit-description" class="edit-input"></textarea>
+                    <button id="save-edit-btn" class="btn btn-primary" style="margin-top:10px;">
+                        Save Changes
+                    </button>
+                </div>
+                <!-- ====================================================== -->
 
-                        <label>Features (comma separated)</label>
-                        <input id="edit-features" class="edit-input">
-
-                        <label>Modules & Components</label>
-                        <div id="module-editor"></div>
-
-                        <button id="add-module-btn" class="btn btn-primary" style="margin-top:10px;">
-                            + Add Module
-                        </button>
-
-                        <label>Tech Stack (comma separated)</label>
-                        <input id="edit-tech" class="edit-input">
-
-                        <label>Target Platform</label>
-                        <input id="edit-platform" class="edit-input">
-
-                        <label>AI Summary</label>
-                        <textarea id="edit-summary" class="edit-input"></textarea>
-
-                        <button id="save-edit-btn" class="btn btn-primary" style="margin-top:10px;">
-                            Save Changes
-                        </button>
-                    </div>
-                    <!-- ====================================================== -->
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary btn-large" id="back-to-step-1">Back</button>
-                        <button class="btn btn-primary btn-large" id="next-to-step-3">Next: Generate UI
-                            Wireframe</button>
-                    </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary btn-large" id="back-to-step-1">Back</button>
+                    <button class="btn btn-primary btn-large" id="next-to-step-3">Next: Generate UI
+                        Wireframe</button>
                 </div>
             </div>
+        </div>
 
 
-            <!-- Step 3: UI Wireframe -->
-            <div class="step-content" id="step-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">UI Wireframe Confirmation & Editing</h3>
-                    </div>
+        <!-- Step 3: UI Wireframe -->
+        <div class="step-content" id="step-3">
+            <div class="card">
 
-                    <div class="input-group">
-                        <p>Based on your project description, we've generated a UI wireframe. You can customize it
-                            below:</p>
-
-                        <div class="wireframe-container" id="wireframe-container" style="display:none;">
-                            <div class="wireframe-preview">
-                                <h4>Wireframe Preview</h4>
-                                <div class="wireframe-box"></div>
-                            </div>
-
-                            <div class="wireframe-edit">
-                                <h4>Customize Wireframe</h4>
-                                <div class="edit-controls">
-                                    <div class="edit-control">
-                                        <label for="layout-type">Layout Type</label>
-                                        <select id="layout-type">
-                                            <option value="sidebar">Sidebar Layout</option>
-                                            <option value="topnav">Top Navigation</option>
-                                            <option value="dashboard">Dashboard</option>
-                                            <option value="mobile">Mobile App</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="edit-control">
-                                        <label for="color-scheme">Color Scheme</label>
-                                        <select id="color-scheme">
-                                            <option value="blue">Blue</option>
-                                            <option value="green">Green</option>
-                                            <option value="purple">Purple</option>
-                                            <option value="dark">Dark</option>
-                                            <!-- Add these -->
-                                            <option value="orange">Orange</option>
-                                            <option value="yellow">Yellow</option>
-                                            <option value="pink">Pink</option>
-                                            <option value="teal">Teal</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="edit-control">
-                                        <label for="primary-color">Primary Color</label>
-                                        <input type="color" id="primary-color" value="#4361ee">
-                                    </div>
-
-                                    <div class="edit-control">
-                                        <label for="app-name">Application Name</label>
-                                        <input type="text" id="app-name" value="My Application">
-                                    </div>
-
-
-                                </div>
-
-                                <button class="btn btn-primary" id="update-wireframe-btn">
-                                    <i class="fas fa-sync-alt"></i> Update Wireframe
-                                </button>
-                                <div id="updateLoader"
-                                    style="display:none; margin-top:10px; font-weight:600; color:#6b46c1;">
-                                    Updating wireframe… Please wait...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary btn-large" id="back-to-step-2">Back</button>
-                        <button class="btn btn-primary btn-large" id="next-to-step-4">Next: Generate APIs</button>
-                    </div>
+                <!-- 🔥 1. HEADER ONLY -->
+                <div class="card-header">
+                    <h3 class="card-title">UI Wireframe Confirmation & Editing</h3>
                 </div>
-            </div>
 
-            <!-- Step 4: Generate APIs -->
-            <div class="step-content" id="step-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Generating APIs</h3>
-                    </div>
+                <!-- 🔥 2. BODY CONTENT STARTS HERE -->
+                <div style="padding: 1rem;">
 
-                    <div class="input-group">
-                        <p>Based on your project description and UI wireframe, we're generating the required APIs...</p>
-                        <div id="api-generation-progress">
-                            <div class="progress-bar"
-                                style="height: 10px; background-color: #e9ecef; border-radius: 5px; margin: 1rem 0;">
-                                <div id="progress-fill"
-                                    style="height: 100%; width: 0%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s;">
+                    <p>Based on your project description, we've generated a UI wireframe. You can customize it below:
+                    </p>
+
+                    <div class="wireframe-container" id="wireframe-container" style="display:none;">
+
+                        <!-- LEFT SIDE: PREVIEW -->
+                        <div class="wireframe-preview">
+                            <h4>Wireframe Preview</h4>
+                            <div class="wireframe-box"></div>
+                        </div>
+
+                        <!-- RIGHT SIDE: CUSTOMIZATION -->
+                        <div class="wireframe-edit">
+                            <h4>Customize Wireframe</h4>
+
+                            <div class="edit-controls">
+
+                                <div class="edit-control">
+                                    <label for="layout-type">Layout Type</label>
+                                    <select id="layout-type">
+                                        <option value="sidebar">Sidebar Layout</option>
+                                        <option value="topnav">Top Navigation</option>
+                                        <option value="dashboard">Dashboard</option>
+                                        <option value="mobile">Mobile App</option>
+                                    </select>
                                 </div>
+
+                                <div class="edit-control">
+                                    <label for="color-scheme">Color Scheme</label>
+                                    <select id="color-scheme">
+                                        <option value="blue">Blue</option>
+                                        <option value="green">Green</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="dark">Dark</option>
+                                        <option value="orange">Orange</option>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="pink">Pink</option>
+                                        <option value="teal">Teal</option>
+                                    </select>
+                                </div>
+
+                                <div class="edit-control">
+                                    <label for="primary-color">Primary Color</label>
+                                    <input type="color" id="primary-color" value="#4361ee">
+                                </div>
+
+                                <div class="edit-control">
+                                    <label for="app-name">Application Name</label>
+                                    <input type="text" id="app-name" value="My Application">
+                                </div>
+
+                                <div class="edit-control">
+                                    <label>Modules</label>
+                                    <select id="moduleSelect"></select>
+                                </div>
+
                             </div>
-                            <p id="progress-text">Analyzing requirements...</p>
-                        </div>
-                    </div>
 
-                    <div class="api-list" id="api-list" style="display: none;">
-                        <!-- APIs will be generated here -->
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary btn-large" id="back-to-step-3">Back</button>
-                        <button class="btn btn-primary btn-large" id="next-to-step-5" style="display: none;">Next:
-                            Confirm APIs</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 5: Confirm APIs -->
-            <div class="step-content" id="step-5">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Confirm Generated APIs</h3>
-                    </div>
-
-                    <div class="input-group">
-                        <p>Review the generated APIs and make any necessary adjustments:</p>
-                        <div class="api-list" id="api-confirm-list">
-                            <!-- APIs for confirmation will appear here -->
-                        </div>
-
-                        <div class="input-group" style="margin-top: 2rem;">
-                            <button class="btn btn-outline" id="add-api-btn">
-                                <i class="fas fa-plus"></i> Add New API
+                            <button class="btn btn-primary" id="update-wireframe-btn">
+                                <i class="fas fa-sync-alt"></i> Update Wireframe
                             </button>
-                        </div>
-                    </div>
 
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary btn-large" id="back-to-step-4">Back</button>
-                        <button class="btn btn-primary btn-large" id="next-to-step-6">Next: Generate Full Code</button>
+                            <div id="updateLoader"
+                                style="display:none; margin-top:10px; font-weight:600; color:#6b46c1;">
+                                Updating wireframe… Please wait...
+                            </div>
+
+                        </div> <!-- END EDIT -->
+                    </div> <!-- END CONTAINER -->
+
+                </div> <!-- END BODY CONTENT -->
+
+                <!-- 🔥 3. FOOTER BUTTONS AT BOTTOM -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary btn-large" id="back-to-step-2">Back</button>
+                    <button class="btn btn-primary btn-large" id="next-to-step-4">Next: Generate APIs</button>
+                </div>
+
+            </div> <!-- card -->
+        </div>
+
+
+        <!-- Step 4: Generate APIs -->
+        <div class="step-content" id="step-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Generating APIs</h3>
+                </div>
+
+                <div class="input-group">
+                    <p>Based on your project description and UI wireframe, we're generating the required APIs...</p>
+                    <div id="api-generation-progress">
+                        <div class="progress-bar"
+                            style="height: 10px; background-color: #e9ecef; border-radius: 5px; margin: 1rem 0;">
+                            <div id="progress-fill"
+                                style="height: 100%; width: 0%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s;">
+                            </div>
+                        </div>
+                        <p id="progress-text">Analyzing requirements...</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Step 6: Generate Code -->
-            <div class="step-content" id="step-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Generating Full Codebase</h3>
-                    </div>
+                <div class="api-list" id="api-list" style="display: none;">
+                    <!-- APIs will be generated here -->
+                </div>
 
-                    <div class="input-group">
-                        <p>We're now generating the complete codebase based on your confirmed APIs and UI wireframe...
-                        </p>
-                        <div id="code-generation-progress">
-                            <div class="progress-bar"
-                                style="height: 10px; background-color: #e9ecef; border-radius: 5px; margin: 1rem 0;">
-                                <div id="code-progress-fill"
-                                    style="height: 100%; width: 0%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s;">
-                                </div>
-                            </div>
-                            <p id="code-progress-text">Setting up project structure...</p>
-                        </div>
-                    </div>
-
-                    <div class="file-tree" id="file-tree" style="display: none;">
-                        <h4>Project Structure</h4>
-                        <ul id="file-tree-list">
-                            <!-- File tree will be generated here -->
-                        </ul>
-                    </div>
-
-                    <div class="code-preview" id="code-preview" style="display: none;">
-                        <div class="output-header">
-                            <div>server.js</div>
-                            <button class="copy-btn">Copy Code</button>
-                        </div>
-                        <pre><code id="preview-code">// Code preview will appear here</code></pre>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary btn-large" id="back-to-step-5">Back</button>
-                        <button class="btn btn-primary btn-large" id="next-to-step-7" style="display: none;">Next:
-                            Download Code</button>
-                    </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary btn-large" id="back-to-step-3">Back</button>
+                    <button class="btn btn-primary btn-large" id="next-to-step-5" style="display: none;">Next:
+                        Confirm APIs</button>
                 </div>
             </div>
+        </div>
 
-            <!-- Step 7: Download Code -->
-            <div class="step-content" id="step-7">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Download Your Generated Code</h3>
+        <!-- Step 5: Confirm APIs -->
+        <div class="step-content" id="step-5">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Confirm Generated APIs</h3>
+                </div>
+
+                <div class="input-group">
+                    <p>Review the generated APIs and make any necessary adjustments:</p>
+                    <div class="api-list" id="api-confirm-list">
+                        <!-- APIs for confirmation will appear here -->
                     </div>
 
-                    <div class="input-group">
-                        <p>Your code has been successfully generated! Choose your preferred download option:</p>
-
-                        <div class="download-options">
-                            <div class="download-option selected" data-format="zip">
-                                <div class="download-icon"><i class="fas fa-file-archive"></i></div>
-                                <div>ZIP Archive</div>
-                                <small>Complete project in a ZIP file</small>
-                            </div>
-                            <div class="download-option" data-format="github">
-                                <div class="download-icon"><i class="fab fa-github"></i></div>
-                                <div>GitHub Repository</div>
-                                <small>Push directly to GitHub</small>
-                            </div>
-                            <div class="download-option" data-format="docker">
-                                <div class="download-icon"><i class="fab fa-docker"></i></div>
-                                <div>Docker Container</div>
-                                <small>Ready-to-run container</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="project-name">Project Name</label>
-                        <input type="text" id="project-name" placeholder="Enter your project name">
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary btn-large" id="back-to-step-6">Back</button>
-                        <button class="btn btn-success btn-large" id="download-btn">Download Code</button>
+                    <div class="input-group" style="margin-top: 2rem;">
+                        <button class="btn btn-outline" id="add-api-btn">
+                            <i class="fas fa-plus"></i> Add New API
+                        </button>
                     </div>
                 </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary btn-large" id="back-to-step-4">Back</button>
+                    <button class="btn btn-primary btn-large" id="next-to-step-6">Next: Generate Full Code</button>
+                </div>
             </div>
+        </div>
+
+        <!-- Step 6: Generate Code -->
+        <div class="step-content" id="step-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Generating Full Codebase</h3>
+                </div>
+
+                <div class="input-group">
+                    <p>We're now generating the complete codebase based on your confirmed APIs and UI wireframe...
+                    </p>
+                    <div id="code-generation-progress">
+                        <div class="progress-bar"
+                            style="height: 10px; background-color: #e9ecef; border-radius: 5px; margin: 1rem 0;">
+                            <div id="code-progress-fill"
+                                style="height: 100%; width: 0%; background-color: var(--primary); border-radius: 5px; transition: width 0.5s;">
+                            </div>
+                        </div>
+                        <p id="code-progress-text">Setting up project structure...</p>
+                    </div>
+                </div>
+
+                <div class="file-tree" id="file-tree" style="display: none;">
+                    <h4>Project Structure</h4>
+                    <ul id="file-tree-list">
+                        <!-- File tree will be generated here -->
+                    </ul>
+                </div>
+
+                <div class="code-preview" id="code-preview" style="display: none;">
+                    <div class="output-header">
+                        <div>server.js</div>
+                        <button class="copy-btn">Copy Code</button>
+                    </div>
+                    <pre><code id="preview-code">// Code preview will appear here</code></pre>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary btn-large" id="back-to-step-5">Back</button>
+                    <button class="btn btn-primary btn-large" id="next-to-step-7" style="display: none;">Next:
+                        Download Code</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 7: Download Code -->
+        <div class="step-content" id="step-7">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Download Your Generated Code</h3>
+                </div>
+
+                <div class="input-group">
+                    <p>Your code has been successfully generated! Choose your preferred download option:</p>
+
+                    <div class="download-options">
+                        <div class="download-option selected" data-format="zip">
+                            <div class="download-icon"><i class="fas fa-file-archive"></i></div>
+                            <div>ZIP Archive</div>
+                            <small>Complete project in a ZIP file</small>
+                        </div>
+                        <div class="download-option" data-format="github">
+                            <div class="download-icon"><i class="fab fa-github"></i></div>
+                            <div>GitHub Repository</div>
+                            <small>Push directly to GitHub</small>
+                        </div>
+                        <div class="download-option" data-format="docker">
+                            <div class="download-icon"><i class="fab fa-docker"></i></div>
+                            <div>Docker Container</div>
+                            <small>Ready-to-run container</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="project-name">Project Name</label>
+                    <input type="text" id="project-name" placeholder="Enter your project name">
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary btn-large" id="back-to-step-6">Back</button>
+                    <button class="btn btn-success btn-large" id="download-btn">Download Code</button>
+                </div>
+            </div>
+        </div>
         </div>
     </section>
 
@@ -1158,6 +1174,9 @@
     <script>
         const BACKEND_URL = "http://127.0.0.1:8000";
         let selectedWireframePage = null;
+        let lastWireframe = {};           // ✅ REQUIRED FIX
+        let currentWireframe = null;      // optional but recommended
+        let currentProjectId = null;      // required in updateWireframe()
         function normalizeNavText(str) {
             return str
                 .split(",")
@@ -1399,6 +1418,31 @@
                 alert("Module format invalid. Use JSON format.");
                 return [];
             }
+        }
+
+        function loadModuleDropdown(wireframe) {
+            const nav = wireframe.navigation || [];
+            const select = document.getElementById("moduleSelect");
+
+            select.innerHTML = ""; // clear old
+
+            nav.forEach(item => {
+                const opt = document.createElement("option");
+                opt.value = item.id;
+                opt.textContent = item.label;
+                select.appendChild(opt);
+            });
+
+            // select first module
+            if (!selectedWireframePage && nav.length) {
+                selectedWireframePage = nav[0].id;
+            }
+
+            // change preview when dropdown changes
+            select.onchange = e => {
+                selectedWireframePage = e.target.value;
+                renderAIWireframePreview(wireframe);
+            };
         }
 
         function renderModuleEditor(modules) {
@@ -1644,13 +1688,8 @@
                 // REAL AI OUTPUT JSON
                 const w = data.wireframe || {};
                 window.currentWireframe = w;
-                const navKeyInit = (w.navigation || [])
-                    .map(n => (n.label || n.name || "").toLowerCase().replace(/\s+/g, ""))
-                    .join(",");
-                lastWireframe = { ...w };
-                lastWireframe.navigation_text = normalizeNavText(
-                    (w.navigation || []).map(n => n.label || n.name).join(",")
-                );
+                loadModuleDropdown(w);
+
 
 
                 // Now normalize values SAFELY (after w exists)
@@ -1692,6 +1731,11 @@
                 safeSet("primary-color", lastWireframe.primary_color || "#4361ee");
                 safeSet("color-scheme", lastWireframe.color_scheme || "blue");
 
+                // Select first module by default
+                if (!selectedWireframePage && w.navigation?.length) {
+                    selectedWireframePage = w.navigation[0].id;
+                }
+
                 // Render Preview (uses the robust renderer below)
                 renderAIWireframePreview(w);
 
@@ -1714,61 +1758,79 @@
 
         // ---------- Replace renderComponent ----------
         function renderComponent(c, primary, radius, shadow, isMobile = false) {
-            // make sure c is object and has a type
             if (!c || typeof c !== 'object') c = { type: 'card', title: String(c || '') };
 
             const safeTitle = c.title || c.label || c.name || '';
             const baseStyle = `
-        padding:15px;
-        background:white;
-        border-radius:${radius}px;
-        border:1px solid #ddd;
-        box-shadow:${shadow};
-    `;
+               padding:15px;
+               background:white;
+               border-radius:${radius}px;
+               border:1px solid #ddd;
+               box-shadow:${shadow};
+            `;
 
-            // Normalize component type aliases
-            const t = (c.type || '').toString().toLowerCase();
-            if (t === 'stat' || t === 'stat_card' || t === 'card' || t.includes('stats')) {
+            const t = (c.type || '').toLowerCase();
+
+            // --- STAT CARD ---
+            if (t.includes("stat") || t === "card") {
                 return `
             <div style="${baseStyle}">
-                <h4 style="margin:0 0 6px 0;">${safeTitle}</h4>
-                <p style="font-size:20px;font-weight:bold;color:${primary};margin:0;">${c.value ?? c.count ?? ''}</p>
-                ${c.subtitle ? `<small style="color:${primary};opacity:.7">${c.subtitle}</small>` : ''}
-            </div>
-        `;
-            }
-
-            if (t === 'chart' || t.includes('chart')) {
-                return `
-            <div style="${baseStyle};text-align:center;">
                 <h4 style="margin-bottom:8px;">${safeTitle}</h4>
-                <div style="height:${isMobile ? 120 : 180}px;background:#e9ecef;border-radius:${radius}px;"></div>
-            </div>
-        `;
+                <p style="font-size:20px;font-weight:bold;color:${primary};">
+                    ${c.value || ""}
+                </p>
+            </div>`;
             }
 
-            if (t === 'table' || t.includes('table')) {
-                const cols = (c.columns || []).slice(0, 4).map(col => `<th style="text-align:left;padding:6px 8px;">${col}</th>`).join("");
+            // --- TABLE (FIELDS) ---
+            if (t.includes("table")) {
+                let rows = "";
+
+                (c.data || []).forEach(f => {
+                    rows += `
+                <tr>
+                    <td style="padding:6px 10px;border-bottom:1px solid #eee;">
+                        ${f}
+                    </td>
+                </tr>`;
+                });
+
                 return `
-            <div style="${baseStyle}">
-                <h4 style="margin-bottom:10px;">${safeTitle}</h4>
-                <div style="overflow:auto;border-radius:${radius}px;background:#fff;border:1px solid #f1f1f1;padding:8px;">
-                    <table style="width:100%;border-collapse:collapse;">
-                        <thead><tr>${cols}</tr></thead>
-                        <tbody>
-                            <tr><td colspan="${Math.max(1, (c.columns || []).length)}" style="padding:12px;color:#888;">Table preview</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
+        <div style="${baseStyle}">
+            <h4 style="margin-bottom:10px;">${safeTitle}</h4>
+            <table style="width:100%;border-collapse:collapse;">
+                <tbody>
+                    ${rows || "<tr><td>No fields</td></tr>"}
+                </tbody>
+            </table>
+        </div>`;
             }
 
-            if (t === 'button' || t === 'cta') {
-                return `<div style="${baseStyle};display:flex;align-items:center;justify-content:center;"><button class="btn btn-primary">${c.label || safeTitle || 'Action'}</button></div>`;
+            // --- LIST (ACTIONS) ---
+            if (t.includes("list")) {
+                let items = "";
+                (c.items || []).forEach(a => {
+                    items += `
+                <li style="padding:6px 0;border-bottom:1px solid #eee;">
+                    ${a}
+                </li>`;
+                });
+
+                return `
+        <div style="${baseStyle}">
+            <h4 style="margin-bottom:10px;">${safeTitle}</h4>
+            <ul style="list-style:none;padding:0;margin:0;">
+                ${items || "<li>No actions</li>"}
+            </ul>
+        </div>`;
             }
 
-            // fallback simple box
+            // --- BUTTON ---
+            if (t === "button") {
+                return `<button class="btn btn-primary">${safeTitle}</button>`;
+            }
+
+            // FALLBACK
             return `<div style="${baseStyle}">${safeTitle}</div>`;
         }
 
@@ -1778,207 +1840,52 @@
             const preview = document.querySelector(".wireframe-box");
             preview.innerHTML = "";
 
-            // Robust normalization for layout, colors, nav and pages
-            const layout = (w.layout_type || w.layout?.type || w.ui_layout || w.layoutType || 'sidebar').toString().toLowerCase();
-            // Determine final primary color
-            // Add this inside renderAIWireframePreview, at the top
-            const COLOR_SCHEMES = {
-                blue: "#4361ee",
-                green: "#2F9E44",
-                purple: "#7209b7",
-                dark: "#1e293b",
+            const pages = w.pages || {};
+            const currentId = selectedWireframePage || Object.keys(pages)[0];
+            const page = pages[currentId];
 
-                // 🎨 Add more custom palettes here:
-                orange: "#f77f00",
-                pink: "#d6336c",
-                teal: "#0ca678",
-                yellow: "#f59f00"
-            };
-            // 🔥 NEW: LATEST ACTION WINS (primary or scheme)
-            let primary;
-
-            // What was the last modified field?
-            if (w.__lastChanged === "primary") {
-                // User manually changed primary color last
-                primary = w.primary_color || "#4361ee";
-            } else if (w.__lastChanged === "scheme") {
-                // User picked a color scheme last
-                primary = COLOR_SCHEMES[w.color_scheme] || "#4361ee";
-            } else {
-                // Default behavior on first load
-                primary = w.primary_color || COLOR_SCHEMES[w.color_scheme] || "#4361ee";
+            if (!page) {
+                preview.innerHTML = "<p>No module selected</p>";
+                return;
             }
 
-            const radius = (w.style?.corner_radius || 10);
-            const shadow = (w.style?.shadow ? "0 4px 12px rgba(0,0,0,0.12)" : "none");
-            const navigation = w.navigation || w.nav || [];
-            let pages = w.pages || w.pageMap || {};
+            const comps = page.components || [];
 
-            // If pages is array -> convert to object keyed by id/title
-            if (Array.isArray(pages)) {
-                const obj = {};
-                pages.forEach(p => {
-                    const key = (p.id || p.key || (p.title && p.title.toLowerCase().replace(/\s+/g, '-')) || `page-${Math.random().toString(36).slice(2, 7)}`);
-                    obj[key] = { title: p.title || p.label || key, components: p.components || p.widgets || [] };
-                });
-                pages = obj;
-            }
+            let fields = [];
+            let actions = [];
 
-            // If pages is empty object, provide a safe default
-            if (!pages || (typeof pages === 'object' && Object.keys(pages).length === 0)) {
-                pages = {
-                    dashboard: {
-                        title: "Dashboard",
-                        components: [
-                            { type: "card", title: "Total Students", value: "250" },
-                            { type: "card", title: "Today Present", value: "230" },
-                            { type: "chart", title: "Attendance Trend" }
-                        ]
-                    }
-                };
-            }
+            // Extract values from components
+            comps.forEach(c => {
+                const t = (c.type || "").toLowerCase();
 
-            // Ensure each page has components array
-            Object.keys(pages).forEach(k => {
-                const p = pages[k];
-                if (!Array.isArray(p.components)) {
-                    // if components is list of strings convert to {type:'card', title:...}
-                    if (Array.isArray(p) || Array.isArray(p.components)) {
-                        p.components = p.components || [];
-                    } else if (typeof p.components === 'string') {
-                        p.components = [{ type: 'card', title: p.components }];
-                    } else {
-                        p.components = p.components || [];
-                    }
+                if (t === "card" || t === "table") {
+                    fields = c.data || [];
+                }
+
+                if (t === "list") {
+                    actions = c.items || [];
                 }
             });
 
-            // clickable sidebar
-            document.querySelectorAll(".nav-item").forEach(item => {
-                item.addEventListener("click", () => {
-                    selectedWireframePage = item.dataset.page;
+            const title = page.title || "Module";
 
-                    // highlight active
-                    document.querySelectorAll(".nav-item").forEach(i =>
-                        i.classList.remove("active")
-                    );
-                    item.classList.add("active");
+            preview.innerHTML = `
+        <h3 style="margin-bottom:10px;">${title} — Fields</h3>
+        <div style="border:1px solid #ddd;padding:10px;border-radius:8px;margin-bottom:20px;">
+            ${fields.length
+                    ? fields.map(f => `<div style='padding:6px 0;border-bottom:1px solid #eee;'>${f}</div>`).join("")
+                    : "<p>No fields</p>"}
+        </div>
 
-                    renderAIWireframePreview(w);
-                });
-            });
-
-            // ---- SIDEBAR LAYOUT ----
-            if (layout === "sidebar") {
-                preview.innerHTML = `
-            <div style="display:flex;min-height:420px;border-radius:${radius}px;overflow:hidden;
-                border:1px solid #ddd;box-shadow:${shadow};">
-
-                <aside style="width:240px;background:${primary};color:white;padding:20px;">
-                    <h3 style="margin-bottom:20px;">${w.app_name || w.appName || w.title || 'App'}</h3>
-                    ${(navigation || []).map(n => `
-    <div class="nav-item" data-page="${n.id || n.label.toLowerCase().replace(/\s+/g, '')}"
-         style="padding:10px 0;font-size:16px;cursor:pointer;">
-        ${n.icon ? n.icon : '📌'} ${n.label}
-    </div>
-`).join("")}
-                </aside>
-
-                <main style="flex:1;background:#fafafa;padding:20px;">
-                    ${(() => {
-                        const pid = selectedWireframePage || Object.keys(pages)[0];
-                        const page = pages[pid];
-
-                        if (!page) return "<p>No page found</p>";
-
-                        return `
-        <h2 style="margin-bottom:15px;color:${primary};">${page.title}</h2>
-
-        <div style="display:grid;
-                    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-                    gap:12px;">
-            ${(page.components || []).map(c =>
-                            renderComponent(c, primary, radius, shadow)
-                        ).join("")}
+        <h3 style="margin-bottom:10px;">${title} — Actions</h3>
+        <div style="border:1px solid #ddd;padding:10px;border-radius:8px;">
+            ${actions.length
+                    ? actions.map(a => `<div style='padding:6px 0;border-bottom:1px solid #eee;'>${a}</div>`).join("")
+                    : "<p>No actions</p>"}
         </div>
     `;
-                    })()}
-                </main>
-            </div>
-        `;
-                return;
-            }
-
-            // ---- TOP NAV LAYOUT ----
-            if (layout === "topnav" || layout === "dashboard") {
-
-                preview.innerHTML = `
-        <div style="border:1px solid #ddd;border-radius:${radius}px;box-shadow:${shadow};overflow:hidden;">
-
-            <header style="background:${primary};color:white;padding:15px 20px;">
-                <h2 style="margin:0;">${w.app_name || 'App'}</h2>
-            </header>
-
-            <nav style="display:flex;gap:20px;background:#f1f3f5;padding:12px 20px;border-bottom:1px solid #ddd;">
-                ${(navigation || []).map(n => `
-                    <div class="nav-item"
-                         data-page="${n.id || n.label.toLowerCase().replace(/\\s+/g, '')}"
-                         style="cursor:pointer;font-weight:600;">
-                         ${n.label}
-                    </div>
-                `).join("")}
-            </nav>
-
-            <div style="padding:20px;">
-                ${(() => {
-                        const pid = selectedWireframePage || Object.keys(pages)[0];
-                        const page = pages[pid];
-                        if (!page) return "<p>No page found</p>";
-
-                        return `
-                        <h2 style="color:${primary};">${page.title}</h2>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:15px;">
-                            ${(page.components || []).map(c =>
-                            renderComponent(c, primary, radius, shadow)
-                        ).join("")}
-                        </div>
-                    `;
-                    })()}
-            </div>
-
-        </div>
-    `;
-
-                return;
-            }
-
-            // ---- MOBILE LAYOUT: render ONLY if layout_type === 'mobile' ----
-            if (layout === "mobile") {
-                preview.innerHTML = `
-            <div style="width:360px;margin:auto;border-radius:${radius}px;
-                border:1px solid #aaa;overflow:hidden;box-shadow:${shadow};">
-
-                <header style="background:${primary};color:white;padding:12px;text-align:center;">
-                    <h3 style="margin:0;">${w.app_name || 'App'}</h3>
-                </header>
-
-                <div style="padding:15px;background:white;">
-                    ${Object.keys(pages).map(pid => {
-                    const page = pages[pid];
-                    return `
-                            <h4 style="margin-bottom:10px;color:${primary};">${page.title}</h4>
-                            ${(page.components || []).map(c => renderComponent(c, primary, radius, shadow, true)).join("")}
-                        `;
-                }).join("")}
-                </div>
-            </div>
-        `;
-                return;
-            }
-
-            // default fallback if an unknown layout came through
-            preview.innerHTML = `<div style="padding:20px;">Unsupported layout: ${layout}. Showing default preview.</div>`;
         }
+
 
         function goToStep4() {
             goToStep(4);
@@ -2807,6 +2714,50 @@ const styles = StyleSheet.create({
     </div>
 
     <style>
+        /* === Module Dropdown === */
+        .module-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .module-dropbtn {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .module-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 240px;
+            max-height: 350px;
+            overflow-y: auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+            z-index: 2000;
+        }
+
+        .module-dropdown-content a {
+            padding: 10px 14px;
+            display: block;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .module-dropdown-content a:hover {
+            background: #f1f1f1;
+        }
+
+        .module-dropdown:hover .module-dropdown-content {
+            display: block;
+        }
+
         #global-loader {
             position: fixed;
             top: 0;
