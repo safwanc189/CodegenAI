@@ -1424,21 +1424,19 @@
             const nav = wireframe.navigation || [];
             const select = document.getElementById("moduleSelect");
 
-            select.innerHTML = ""; // clear old
+            select.innerHTML = "";
 
             nav.forEach(item => {
                 const opt = document.createElement("option");
                 opt.value = item.id;
-                opt.textContent = item.label;
+                opt.textContent = item.label || item.id;
                 select.appendChild(opt);
             });
 
-            // select first module
             if (!selectedWireframePage && nav.length) {
                 selectedWireframePage = nav[0].id;
             }
 
-            // change preview when dropdown changes
             select.onchange = e => {
                 selectedWireframePage = e.target.value;
                 renderAIWireframePreview(wireframe);
@@ -1710,16 +1708,16 @@
 
 
                 document.getElementById("app-name").value =
-                    lastWireframe.app_name || "My Application";
+                    w.app_name || lastWireframe.app_name || "My Application";
 
                 document.getElementById("layout-type").value =
-                    lastWireframe.layout_type || "sidebar";
+                    w.layout_type || lastWireframe.layout_type || "sidebar";
 
                 document.getElementById("primary-color").value =
-                    lastWireframe.primary_color || "#4361ee";
+                    w.primary_color || lastWireframe.primary_color || "#4361ee";
 
                 document.getElementById("color-scheme").value =
-                    lastWireframe.color_scheme || "blue";
+                    w.color_scheme || lastWireframe.color_scheme || "blue";
 
                 const safeSet = (id, value) => {
                     const el = document.getElementById(id);
@@ -1842,7 +1840,8 @@
 
             const pages = w.pages || {};
             const currentId = selectedWireframePage || Object.keys(pages)[0];
-            const page = pages[currentId];
+            const normalizedId = (currentId || "").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+            const page = pages[normalizedId];
 
             if (!page) {
                 preview.innerHTML = "<p>No module selected</p>";
@@ -1850,41 +1849,40 @@
             }
 
             const comps = page.components || [];
+            let html = `<h2 style="margin-bottom:20px;">${page.title}</h2>`;
 
-            let fields = [];
-            let actions = [];
-
-            // Extract values from components
             comps.forEach(c => {
-                const t = (c.type || "").toLowerCase();
-
-                if (t === "card" || t === "table") {
-                    fields = c.data || [];
+                if (c.type === "input") {
+                    html += `
+                <div style="margin-bottom:12px;">
+                    <label style="display:block;font-weight:bold;">${c.label}</label>
+                    <input type="${c.inputType || "text"}" 
+                        style="width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;">
+                </div>
+            `;
                 }
 
-                if (t === "list") {
-                    actions = c.items || [];
+                if (c.type === "button") {
+                    html += `
+                <button style="
+                    padding:10px 20px;
+                    background:#6A0DAD;
+                    color:white;
+                    border-radius:6px;
+                    margin-top:10px;
+                    border:none;
+                    cursor:pointer;
+                ">
+                    ${c.label}
+                </button>
+            `;
                 }
             });
 
-            const title = page.title || "Module";
-
-            preview.innerHTML = `
-        <h3 style="margin-bottom:10px;">${title} — Fields</h3>
-        <div style="border:1px solid #ddd;padding:10px;border-radius:8px;margin-bottom:20px;">
-            ${fields.length
-                    ? fields.map(f => `<div style='padding:6px 0;border-bottom:1px solid #eee;'>${f}</div>`).join("")
-                    : "<p>No fields</p>"}
-        </div>
-
-        <h3 style="margin-bottom:10px;">${title} — Actions</h3>
-        <div style="border:1px solid #ddd;padding:10px;border-radius:8px;">
-            ${actions.length
-                    ? actions.map(a => `<div style='padding:6px 0;border-bottom:1px solid #eee;'>${a}</div>`).join("")
-                    : "<p>No actions</p>"}
-        </div>
-    `;
+            preview.innerHTML = html;
         }
+
+
 
 
         function goToStep4() {
@@ -1940,16 +1938,13 @@
 
             document.getElementById("updateLoader").style.display = "block";
 
-            // Updated wireframe (style-only)
             const updatedWireframe = {
-                ...lastWireframe,
                 layout_type: layoutType,
                 color_scheme: colorScheme,
                 primary_color: primaryColor,
                 app_name: appName
             };
 
-            // Save to backend
             const fd = new FormData();
             fd.append("project_id", currentProjectId);
             fd.append("wireframe", JSON.stringify(updatedWireframe));
@@ -1959,12 +1954,17 @@
                 body: fd
             });
 
-            // Update preview
-            lastWireframe = updatedWireframe;
-            renderAIWireframePreview(lastWireframe);
+            // Update local copy for live preview
+            lastWireframe = {
+                ...lastWireframe,
+                ...updatedWireframe
+            };
+
+            renderAIWireframePreview(window.currentWireframe);
 
             document.getElementById("updateLoader").style.display = "none";
         }
+
 
         // Handle "Add New" button click dynamically
         document.addEventListener("click", async (e) => {

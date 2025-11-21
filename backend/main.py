@@ -198,12 +198,23 @@ async def upload_synopsis(
     # -----------------------------------------------------------
     # STEP 7: Send response
     # -----------------------------------------------------------
-
+    # ================= CLEAN FINAL PROJECT JSON FOR FRONTEND ==================
+    project_clean = {
+      "title": project_data.get("title", ""),
+      "description": project_data.get("description", ""),
+      "features": project_data.get("features", []),
+      "modules": project_data.get("modules", []),
+      "tech_stack": project_data.get("tech_stack", []),
+      "target_platform": project_data.get("target_platform", "Web"),
+      "ai_summary": project_data.get("ai_summary", ""),
+      "wireframe": {}
+    }
+    
     return {
         "success": True,
         "message": "Project parsed & saved successfully with AI 🧠",
         "project_id": str(project_id),
-        "project": project_data
+        "project": project_clean
     }
 
 # =============================================================================
@@ -298,8 +309,30 @@ async def generate_wireframe(project_id: str = Form(...)):
     # ------------------------------------------------------------
     try:
         ai_wireframe = await generate_wireframe_ai(project)
+        wf = ai_wireframe
+        
+        nav = []
+        for mod in project.get("modules", []):
+            slug = re.sub(r"[^a-zA-Z0-9]+", "-", mod["name"]).lower()
+            nav.append({
+                "id": slug,
+                "label": mod["name"],
+                "path": f"/{slug}"
+            })
+                
+        wireframe_clean = {
+           "layout_type": project.get("ui_layout", "sidebar"),
+           "color_scheme": project.get("ui_color_scheme", "blue"),
+           "primary_color": project.get("ui_primary_color", "#4361ee"),
+           "app_name": project.get("title", "Application"),
+
+           "navigation": nav,
+           "pages": wf.get("pages", {})
+        }
     except Exception as e:
         print("❌ [AI ERROR]:", e)
+        import traceback
+        traceback.print_exc()
         return {
             "success": False,
             "error": "AI wireframe generation failed",
@@ -323,8 +356,12 @@ async def generate_wireframe(project_id: str = Form(...)):
     try:
         oid = ObjectId(project_id)
         await collection.update_one(
-            {"_id": oid},
-            {"$set": {"wireframe": ai_wireframe}}
+          {"_id": oid},
+          {"$set": {
+            "wireframe": wireframe_clean,
+            "status": "wireframe_generated",
+            "updated_at": datetime.utcnow().isoformat()
+           }}
         )
         print("✅ Wireframe saved to DB")
     except Exception as e:
@@ -341,7 +378,7 @@ async def generate_wireframe(project_id: str = Form(...)):
         "success": True,
         "project_id": project_id,
         "title": project.get("title"),
-        "wireframe": ai_wireframe
+        "wireframe": wireframe_clean
     }
 
 
@@ -352,19 +389,28 @@ async def generate_wireframe(project_id: str = Form(...)):
 async def update_wireframe(project_id: str = Form(...), wireframe: str = Form(...)):
     try:
         oid = ObjectId(project_id)
-        wf = json.loads(wireframe)
+        new_data = json.loads(wireframe)
 
-        # Always just save – NEVER trigger AI
-        result = await collection.update_one(
+        project = await get_project(project_id)
+        if not project:
+            return {"success": False, "error": "Project not found"}
+
+        old_wf = project.get("wireframe", {})
+
+        # ONLY UPDATE STYLE VALUES
+        old_wf.update({
+           "layout_type": new_data.get("layout_type", old_wf.get("layout_type")),
+           "color_scheme": new_data.get("color_scheme", old_wf.get("color_scheme")),
+           "primary_color": new_data.get("primary_color", old_wf.get("primary_color")),
+           "app_name": new_data.get("app_name", old_wf.get("app_name"))
+        })
+
+        await collection.update_one(
             {"_id": oid},
-            {"$set": {"wireframe": wf}}
+            {"$set": {"wireframe": old_wf}}
         )
 
-        return {
-            "success": True,
-            "modified": result.modified_count > 0,
-            "message": "Wireframe updated successfully"
-        }
+        return {"success": True, "message": "Wireframe updated (merged)"}
 
     except Exception as e:
         return {"success": False, "error": str(e)}
